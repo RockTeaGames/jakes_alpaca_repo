@@ -1,5 +1,5 @@
-const API_KEY = 'PK817D57NCDH7J6WSU3C';
-const API_SECRET = '2JPvTyN6JK0aCgOAjb5qxIOfa4P09CDaVHzLzHcm';
+const API_KEY = 'PKSSJH4T5HZL15DXGM49';
+const API_SECRET = 'axb4eQ8sQlA9ULzngpc6dZbVwk6i2zArWM4Ow6nH';
 const MINUTE = 60000;
 const PAPER = true;
 
@@ -7,22 +7,20 @@ const theStock = "AAPL";
 
 class theTest {
     constructor(API_KEY, API_SECRET, PAPER) {
-        this.Alpaca = require('@alpacahq/alpaca-trade-api');
+        this.Alpaca = require('./lib/alpaca-trade-api');
         this.alpaca = new this.Alpaca({
             keyId: API_KEY,
             secretKey: API_SECRET,
             paper: PAPER
         });
-        this.runningAverage = 0;
-        this.lastOrder = null;
-        this.timeToClose = null;
         this.stock = theStock;
 
         setInterval(() => { }, 1 << 30); //keep terminal open
     }
 
-    async run() {
-        await this.submitMarketOrder(1, this.stock, 'buy')
+    async myaccount() {
+        var myID = await this.alpaca.getAccount();
+        console.log(myID)
     }
 
     async cancelAll() {
@@ -52,7 +50,7 @@ class theTest {
                 this.lastOrder = resp;
                 console.log("Market order of |" + quantity + " " + stock + " " + side + "| completed.");
             }).catch((err) => {
-                console.log("Order of |" + quantity + " " + stock + " " + side + "| did not go through.");
+                console.log("Order of |" + quantity + " " + stock + " " + side + "| did not go through. " + err);
             });
         }
         else {
@@ -63,5 +61,7 @@ class theTest {
 
 var testit = new theTest(API_KEY, API_SECRET, PAPER);
 
-//testit.run();
-testit.cancelAll();
+testit.myaccount();
+//testit.submitMarketOrder(2, 'MSFT', 'sell');
+//testit.submitMarketOrder(2, 'MSFT', 'buy');
+//testit.cancelAll();

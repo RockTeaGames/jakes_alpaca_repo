@@ -1,6 +1,6 @@
-const Alpaca = require('@alpacahq/alpaca-trade-api')
-const API_KEY = 'PK817D57NCDH7J6WSU3C';
-const API_SECRET = '2JPvTyN6JK0aCgOAjb5qxIOfa4P09CDaVHzLzHcm';
+const Alpaca = require('./lib/alpaca-trade-api')
+const API_KEY = 'PKSSJH4T5HZL15DXGM49';
+const API_SECRET = 'axb4eQ8sQlA9ULzngpc6dZbVwk6i2zArWM4Ow6nH';
 const USE_POLYGON = false;  // by default we use the Alpaca data stream but you can change that
 
 const MINUTE = 60000

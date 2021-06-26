@@ -1,5 +1,5 @@
-const API_KEY = 'PK817D57NCDH7J6WSU3C';
-const API_SECRET = '2JPvTyN6JK0aCgOAjb5qxIOfa4P09CDaVHzLzHcm';
+const API_KEY = 'PKSSJH4T5HZL15DXGM49';
+const API_SECRET = 'axb4eQ8sQlA9ULzngpc6dZbVwk6i2zArWM4Ow6nH';
 const MINUTE = 60000;
 const PAPER = true;
 
@@ -7,7 +7,7 @@ const theStock = 'AAPL';
 
 class MeanReversion {
     constructor(API_KEY, API_SECRET, PAPER) {
-        this.Alpaca = require('@alpacahq/alpaca-trade-api');
+        this.Alpaca = require('./lib/alpaca-trade-api');
         this.alpaca = new this.Alpaca({
             keyId: API_KEY,
             secretKey: API_SECRET,

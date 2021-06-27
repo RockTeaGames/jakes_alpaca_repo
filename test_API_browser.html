@@ -1,12 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Paper Alpaca</title>
+    <link rel="stylesheet" type="text/css" href="test_API_browser.css" />
+    <script src="./test_API_browser.js"></script>
+    <script src="./lib/cors-api.js"></script>
+  </head>
+  <body>
+    <h1>Jake's Alpaca Test |  Paper Trading Account</h1>
+    <div class="right-side">
+      <pre class="log-info"></pre>
+      <button type="button" class="btn" onclick="run_myAccount();">
+        Get Account Info
+      </button>
+    </div>
+
+    <div class="left-side">
+      <div class="log-output"></div>
+      <br />
+
+      Ticker:
+      <input class="input" id="ticker" type="text" placeholder="AAPL" />
+      <br />
+      Quantity:
+      <input class="input" id="qty" type="text" placeholder="100" />
+      <br />
+
+      <button type="button" class="btn" onclick="run_submitOrder();">
+        Submit Order
+      </button>
+      <button type="button" class="btn" onclick="run_cancelAll();">
+        Cancel All
+      </button>
+    </div>
+  </body>
 </html>

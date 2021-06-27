@@ -1,0 +1,48 @@
+.right-side,
+.left-side {
+  display: float;
+}
+.right-side {
+  float: right;
+}
+.left-side {
+  float: left;
+}
+
+.log-output,
+.log-info {
+  /* display: inline-flex; */
+  height: 40vh;
+  width: 35vw;
+  border: 3px solid darkgreen;
+  border-radius: 15px;
+  overflow-y: scroll;
+  padding: 1em;
+  margin-bottom: 0.5em;
+}
+
+.log-info {
+  height: max-content;
+  margin-bottom: 0.5em;
+  margin-top: 0;
+}
+.btn {
+  /* display: inline-flex; */
+  padding: 1em;
+  margin: 0.5em;
+  border: none;
+  background-color: lightgreen;
+
+  transition-duration: 0.2s;
+}
+
+.input {
+  /* //display: inline-flex; */
+  margin: 0.25em;
+}
+
+.btn:hover {
+  cursor: pointer;
+  background-color: green;
+  color: white;
+}

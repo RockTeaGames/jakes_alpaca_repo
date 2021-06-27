@@ -1,17 +1,10 @@
-const API_KEY = "PKSSJH4T5HZL15DXGM49";
-const API_SECRET = "axb4eQ8sQlA9ULzngpc6dZbVwk6i2zArWM4Ow6nH";
-const MINUTE = 60000;
-const PAPER = true;
-
-const theStock = "AAPL";
-
-class MeanReversion {
+class JakesCode {
   constructor(API_KEY, API_SECRET, PAPER) {
-    this.Alpaca = require("./lib/alpaca-trade-api");
-    this.alpaca = new this.Alpaca({
+    this.alpaca = new AlpacaCORS({
       keyId: API_KEY,
       secretKey: API_SECRET,
       paper: PAPER,
+      baseUrl: "https://paper-api.alpaca.markets",
     });
     this.runningAverage = 0;
     this.lastOrder = null;
@@ -21,31 +14,58 @@ class MeanReversion {
   }
 
   async run() {
-    //setInterval(() => { }, 1 << 30); //keep terminal open
-
     // First, cancel any existing orders so they don't impact our buying power.
     var orders;
     await this.alpaca
       .getOrders({
-        status: "all",
+        status: "open",
         direction: "asc",
       })
       .then((resp) => {
         orders = resp;
       })
       .catch((err) => {
-        console.log(err.error);
+        writeToEventLog(err.error);
       });
     orders.forEach(async (order) => {
       this.alpaca.cancelOrder(order.id).catch((err) => {
-        console.log(err.error);
+        writeToEventLog(err.error);
       });
+      writeToEventLog("Order " + order.id + " canceled.");
     });
+    writeToEventLog("Pre-Script Cancelling Finished.");
 
+    var awaitMarketOpen = new Promise((resolve, reject) => {
+      var check = setInterval(async () => {
+        try {
+          if (theKill) {
+            clearInterval(check);
+          }
+          let clock = await this.alpaca.getClock();
+          if (clock.is_open) {
+            resolve();
+            clearInterval(check);
+          } else {
+            let openTime = new Date(
+              clock.next_open.substring(0, clock.next_close.length - 6)
+            );
+            let currTime = new Date(
+              clock.timestamp.substring(0, clock.timestamp.length - 6)
+            );
+            this.timeToClose = Math.floor((openTime - currTime) / 1000 / 60);
+            writeToEventLog(
+              `${this.timeToClose} minutes til next market open.`
+            );
+          }
+        } catch (err) {
+          writeToEventLog(err.error);
+        }
+      }, MINUTE);
+    });
     // Wait for market to open.
-    console.log("Waiting for market to open...");
-    await this.awaitMarketOpen();
-    console.log("Market opened.");
+    writeToEventLog("Waiting for market to open...");
+    await awaitMarketOpen;
+    writeToEventLog("Market opened!");
 
     // Get the running average of prices of the last 20 minutes, waiting until we have 20 bars from market open.
     var promBars = new Promise((resolve, reject) => {
@@ -53,7 +73,9 @@ class MeanReversion {
         await this.alpaca.getCalendar(Date.now()).then(async (resp) => {
           var marketOpen = resp[0].open;
           await this.alpaca
-            .getBars("minute", this.stock, { start: marketOpen })
+            .getBars("minute", this.stock, {
+              start: marketOpen,
+            })
             .then((resp) => {
               var bars = resp[this.stock];
               if (bars.length >= 20) {
@@ -62,22 +84,21 @@ class MeanReversion {
               }
             })
             .catch((err) => {
-              console.log(err.error);
+              writeToEventLog(err.error);
             });
         });
       }, MINUTE);
     });
-
-    console.log("Waiting for 20 bars...");
+    writeToEventLog("Waiting for 20 bars...");
     await promBars;
-    console.log("We have 20 bars.");
+    writeToEventLog("We have 20 bars!");
 
     // Rebalance our portfolio every minute based off running average data.
     var spin = setInterval(async () => {
       // Clear the last order so that we only have 1 hanging order.
       if (this.lastOrder != null)
         await this.alpaca.cancelOrder(this.lastOrder.id).catch((err) => {
-          console.log(err.error);
+          writeToEventLog(err.error);
         });
 
       // Figure out when the market will close so we can prepare to sell beforehand.
@@ -94,13 +115,13 @@ class MeanReversion {
           );
         })
         .catch((err) => {
-          console.log(err.error);
+          writeToEventLog(err.error);
         });
       this.timeToClose = closingTime - currTime;
 
       if (this.timeToClose < MINUTE * 15) {
         // Close all positions when 15 minutes til market close.
-        console.log("Market closing soon.  Closing positions.");
+        writeToEventLog("Market closing soon.  Closing positions.");
         try {
           await this.alpaca
             .getPosition(this.stock)
@@ -114,13 +135,13 @@ class MeanReversion {
               await promOrder;
             })
             .catch((err) => {
-              console.log(err.error);
+              writeToEventLog(err.error);
             });
         } catch (err) {
           /*console.log(err.error);*/
         }
         clearInterval(spin);
-        console.log("Sleeping until market close (15 minutes).");
+        writeToEventLog("Sleeping until market close (15 minutes).");
         setTimeout(() => {
           // Run script again after market close for next trading day.
           this.run();
@@ -132,31 +153,10 @@ class MeanReversion {
     }, MINUTE);
   }
 
-  // Spin until the market is open
-  async awaitMarketOpen() {
-    return new Promise((resolve) => {
-      const check = async () => {
-        try {
-          let clock = await this.alpaca.getClock();
-          if (clock.is_open) {
-            resolve();
-          } else {
-            let openTime = new Date(
-              clock.next_open.substring(0, clock.next_close.length - 6)
-            );
-            let currTime = new Date(
-              clock.timestamp.substring(0, clock.timestamp.length - 6)
-            );
-            this.timeToClose = Math.floor((openTime - currTime) / 1000 / 60);
-            console.log(`${this.timeToClose} minutes til next market open.`);
-            setTimeout(check, MINUTE);
-          }
-        } catch (err) {
-          console.log(err.error);
-        }
-      };
-      check();
-    });
+  async stopIt() {
+    theKill = true;
+    clearInterval(this.spin);
+    clearInterval(this.barChecker);
   }
 
   // Rebalance our position after an update.
@@ -171,18 +171,20 @@ class MeanReversion {
         positionValue = resp.market_value;
       });
     } catch (err) {
-      /*console.log(err.error);*/
+      writeToEventLog(err.error);
     }
 
     // Get the new updated price and running average.
     var bars;
     await this.alpaca
-      .getBars("minute", this.stock, { limit: 20 })
+      .getBars("minute", this.stock, {
+        limit: 20,
+      })
       .then((resp) => {
         bars = resp[this.stock];
       })
       .catch((err) => {
-        console.log(err.error);
+        writeToEventLog(err.error);
       });
     var currPrice = bars[bars.length - 1].closePrice;
     this.runningAverage = 0;
@@ -194,14 +196,14 @@ class MeanReversion {
     if (currPrice > this.runningAverage) {
       // Sell our position if the price is above the running average, if any.
       if (positionQuantity > 0) {
-        console.log("Setting position to zero.");
+        writeToEventLog("Setting position to zero.");
         await this.submitLimitOrder(
           positionQuantity,
           this.stock,
           currPrice,
           "sell"
         );
-      } else console.log("No position in the stock.  No action required.");
+      } else writeToEventLog("No position in the stock.  No action required.");
     } else if (currPrice < this.runningAverage) {
       // Determine optimal amount of shares based on portfolio and market data.
       var portfolioValue;
@@ -213,7 +215,7 @@ class MeanReversion {
           buyingPower = resp.buying_power;
         })
         .catch((err) => {
-          console.log(err.error);
+          writeToEventLog(err.error);
         });
       var portfolioShare =
         ((this.runningAverage - currPrice) / currPrice) * 200;
@@ -248,12 +250,12 @@ class MeanReversion {
         })
         .then((resp) => {
           this.lastOrder = resp;
-          console.log(
+          writeToEventLog(
             "Limit order of |" + quantity + " " + stock + " " + side + "| sent."
           );
         })
         .catch((err) => {
-          console.log(
+          writeToEventLog(
             "Order of |" +
               quantity +
               " " +
@@ -264,7 +266,7 @@ class MeanReversion {
           );
         });
     } else {
-      console.log(
+      writeToEventLog(
         "Quantity is <=0, order of |" +
           quantity +
           " " +
@@ -289,7 +291,7 @@ class MeanReversion {
         })
         .then((resp) => {
           this.lastOrder = resp;
-          console.log(
+          writeToEventLog(
             "Market order of |" +
               quantity +
               " " +
@@ -300,7 +302,7 @@ class MeanReversion {
           );
         })
         .catch((err) => {
-          console.log(
+          writeToEventLog(
             "Order of |" +
               quantity +
               " " +
@@ -311,7 +313,7 @@ class MeanReversion {
           );
         });
     } else {
-      console.log(
+      writeToEventLog(
         "Quantity is <=0, order of |" +
           quantity +
           " " +
@@ -323,7 +325,3 @@ class MeanReversion {
     }
   }
 }
-
-// Run the mean reversion class.
-var MR = new MeanReversion(API_KEY, API_SECRET, PAPER);
-MR.run();

@@ -1,10 +1,3 @@
-const API_KEY = "PKSSJH4T5HZL15DXGM49";
-const API_SECRET = "axb4eQ8sQlA9ULzngpc6dZbVwk6i2zArWM4Ow6nH";
-const MINUTE = 60000;
-const PAPER = true;
-
-const theStock = "AAPL";
-
 class theTest {
   constructor(API_KEY, API_SECRET, PAPER) {
     this.alpaca = new AlpacaCORS({
@@ -90,37 +83,4 @@ class theTest {
       );
     }
   }
-}
-
-function run_myAccount() {
-  var runIt = new theTest(API_KEY, API_SECRET);
-  runIt.myaccount();
-  //writeToEventLog('this is a test');
-}
-
-function run_cancelAll() {
-  var runIt = new theTest(API_KEY, API_SECRET);
-  runIt.cancelAll();
-  setTimeout(() => {
-    run_myAccount();
-  }, 500);
-}
-
-function run_submitOrder() {
-  var theticker = document.getElementById("ticker").value;
-  var theqty = document.getElementById("qty").value;
-
-  var runIt = new theTest(API_KEY, API_SECRET);
-  runIt.submitMarketOrder(theqty, theticker, "buy");
-  setTimeout(() => {
-    run_myAccount();
-  }, 500);
-}
-
-function writeToEventLog(text) {
-  //console.log(`${text}`);
-  var someDiv = document.querySelector(".log-output");
-  var addBreak = document.createElement("br");
-  someDiv.append(addBreak, `${text}`);
-  someDiv.scrollTop = someDiv.scrollHeight;
 }

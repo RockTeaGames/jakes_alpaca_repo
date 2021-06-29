@@ -12,21 +12,17 @@
     <script src="./JakesAlpaca_forBrowser.js"></script>
   </head>
   <body>
-    <h1>Jake's Alpaca | Starting 1</h1>
-    <h2>Paper Trades</h2>
+    <h1>Jake's Alpaca | Starting | Paper Trades</h1>
 
-    <button type="button" class="btn" onclick="run_myAccount();">
-      Get Account Info
-    </button>
     <button type="button" class="btn start" onclick="run_run();">
       Run Script
     </button>
     <button type="button" class="btn stop" onclick="run_stop();">
       Stop Script
     </button>
-    <br />
 
-    <div class="log-output"></div>
+    <br />
+    <pre class="log-output"></pre>
     <pre class="log-info"></pre>
     <br />
 
@@ -36,7 +32,9 @@
     Quantity:
     <input class="input" id="qty" type="text" placeholder="10" />
     <br />
-
+    <button type="button" class="btn" onclick="run_myAccount();">
+      Get Account Info
+    </button>
     <button type="button" class="btn manual" onclick="run_submitOrder();">
       Submit Order
     </button>

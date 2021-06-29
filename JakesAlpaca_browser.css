@@ -1,45 +1,43 @@
-.right-side,
-.left-side,
-.mid-side {
-  display: float;
-}
-.right-side {
-  float: right;
-}
-.left-side {
-  float: left;
+body{
+  background-color: darkgray;
 }
 
 .log-output,
 .log-info {
-  /* display: inline-flex; */
-  height: 40vh;
-  width: 35vw;
+  display: inline-flex; 
+  height: 33em;
   border: 3px solid darkgreen;
   border-radius: 15px;
   overflow-y: scroll;
   padding: 1em;
   margin-bottom: 0.5em;
 }
-
-.log-info {
-  height: max-content;
-  margin-bottom: 0.5em;
-  margin-top: 0;
+.log-output::-webkit-scrollbar-thumb,
+.log-info::-webkit-scrollbar-thumb {
+  background-color: darkslategray;
+  border: 4px solid transparent;
+  border-radius: 8px;
+  background-clip: padding-box;  
 }
+.log-output::-webkit-scrollbar,
+.log-info::-webkit-scrollbar {
+  width: 16px;
+}
+
+
 .btn {
   padding: 1em;
   margin: 0.5em;
   border: none;
   font-size: medium;
-  background-color: lightsteelblue;
+  background-color: lightgray;
   transition-duration: 0.2s;
 }
-.manual {
-  background-color: lightgray;
+.start{
+  background-color: lightgreen;
 }
 .stop {
-  background-color: red;
+  background-color: pink;
 }
 
 .input {

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Paper Alpaca</title>
+    <link rel="stylesheet" type="text/css" href="JakesAlpaca_browser.css" />
+    <script src="./Jakes_Manual_API_browser.js"></script>
+    <script src="./JakesScript_browser.js"></script>
+    <script src="./lib/cors-api.js"></script>
+    <script src="./JakesAlpaca_forBrowser.js"></script>
+  </head>
+  <body>
+    <h1>Jake's Alpaca | Starting 1</h1>
+    <h2>Paper Trades</h2>
+    <div class="right-side">
+      <pre class="log-info"></pre>
+      <button type="button" class="btn" onclick="run_myAccount();">
+        Get Account Info
+      </button>
+    </div>
+
+    <div class="mid-side">
+      <button type="button" class="btn start" onclick="run_run();">
+        Run Script
+      </button>
+      <button type="button" class="btn stop" onclick="run_stop();">
+        Stop Script
+      </button>
+    </div>
+
+    <div class="left-side">
+      <div class="log-output"></div>
+      <br />
+
+      Ticker:
+      <input class="input" id="ticker" type="text" placeholder="AAPL" />
+      <br />
+      Quantity:
+      <input class="input" id="qty" type="text" placeholder="10" />
+      <br />
+
+      <button type="button" class="btn manual" onclick="run_submitOrder();">
+        Submit Order
+      </button>
+      <button type="button" class="btn manual" onclick="run_cancelAll();">
+        Cancel All
+      </button>
+    </div>
+  </body>
+</html>

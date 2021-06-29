@@ -55,6 +55,6 @@ function writeToEventLog(text) {
   //console.log(`${text}`);
   var someDiv = document.querySelector(".log-output");
   var addBreak = document.createElement("br");
-  someDiv.append(addBreak, `${text}`);
+  someDiv.append(`${text}`,addBreak);
   someDiv.scrollTop = someDiv.scrollHeight;
 }

@@ -14,39 +14,34 @@
   <body>
     <h1>Jake's Alpaca | Starting 1</h1>
     <h2>Paper Trades</h2>
-    <div class="right-side">
-      <pre class="log-info"></pre>
-      <button type="button" class="btn" onclick="run_myAccount();">
-        Get Account Info
-      </button>
-    </div>
 
-    <div class="mid-side">
-      <button type="button" class="btn start" onclick="run_run();">
-        Run Script
-      </button>
-      <button type="button" class="btn stop" onclick="run_stop();">
-        Stop Script
-      </button>
-    </div>
+    <button type="button" class="btn" onclick="run_myAccount();">
+      Get Account Info
+    </button>
+    <button type="button" class="btn start" onclick="run_run();">
+      Run Script
+    </button>
+    <button type="button" class="btn stop" onclick="run_stop();">
+      Stop Script
+    </button>
+    <br />
 
-    <div class="left-side">
-      <div class="log-output"></div>
-      <br />
+    <div class="log-output"></div>
+    <pre class="log-info"></pre>
+    <br />
 
-      Ticker:
-      <input class="input" id="ticker" type="text" placeholder="AAPL" />
-      <br />
-      Quantity:
-      <input class="input" id="qty" type="text" placeholder="10" />
-      <br />
+    Ticker:
+    <input class="input" id="ticker" type="text" placeholder="AAPL" />
+    <br />
+    Quantity:
+    <input class="input" id="qty" type="text" placeholder="10" />
+    <br />
 
-      <button type="button" class="btn manual" onclick="run_submitOrder();">
-        Submit Order
-      </button>
-      <button type="button" class="btn manual" onclick="run_cancelAll();">
-        Cancel All
-      </button>
-    </div>
+    <button type="button" class="btn manual" onclick="run_submitOrder();">
+      Submit Order
+    </button>
+    <button type="button" class="btn manual" onclick="run_cancelAll();">
+      Cancel All
+    </button>
   </body>
 </html>

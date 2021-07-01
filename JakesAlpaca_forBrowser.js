@@ -8,6 +8,8 @@ const theStock = "AAPL";
 var theticker_default = "AAPL";
 var theqty_default = 10;
 
+const testissue = true;
+
 function run_run() {
   writeToEventLog("Starting Script");
   var runIt = new JakesCode(API_KEY, API_SECRET);

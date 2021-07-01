@@ -64,12 +64,6 @@ body{
   grid-row: 2/3;
   grid-column: -2/-1;
 }
-.submit{
-
-}
-.cancel{
-
-}
 
 .div-input{
   grid-column: 1/2;

@@ -17,10 +17,7 @@ class JakesCode {
     // First, cancel any existing orders so they don't impact our buying power.
     var orders;
     await this.alpaca
-      .getOrders({
-        status: "open",
-        direction: "asc",
-      })
+      .getOrders({ status: "open", direction: "asc" })
       .then((resp) => {
         orders = resp;
       })

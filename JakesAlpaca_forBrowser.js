@@ -25,6 +25,7 @@ function run_stop() {
 function run_myAccount() {
   var runIt = new theTest(API_KEY, API_SECRET);
   runIt.myaccount();
+  createChart();
 }
 
 function run_submitOrder() {
@@ -59,4 +60,27 @@ function writeToEventLog(text) {
   var addBreak = document.createElement("br");
   someDiv.append(`${text}`,addBreak);
   someDiv.scrollTop = someDiv.scrollHeight;
+}
+
+function createChart(){
+  TESTER = document.getElementById('chart');
+  var chartdata = [{
+	x: [1, 2, 3, 4, 5],
+	y: [1, 2, 4, 8, 16] 
+  }];
+
+  var chartlayout = {
+    title: 'Jakes Alpaca Chart',
+    margin: {t: 30, b:30}, 
+    layout: {plot_bgcolor: 'rgba(0,0,0,0)', paper_bgcolor: 'rgba(0,0,0,0)'},
+  };
+
+	Plotly.newPlot(TESTER, chartdata, chartlayout);
+}
+
+function testing_function() {
+  writeToEventLog("Running test..");
+  var runIt = new JakesCode(API_KEY, API_SECRET);
+  runIt.testing();
+  
 }

@@ -6,7 +6,19 @@ class JakesCode {
       paper: PAPER,
       baseUrl: "https://paper-api.alpaca.markets",
     });
-    this.runningAverage = 0;
+    this.SMA12 = 0;
+    this.EMA12 = 0;
+    this.EMA12p = 0;
+
+    this.SMA26 = 0;
+    this.EMA26 = 0;
+    this.EMA26p = 0;
+
+    this.MACDsignalSMA = 0;
+    this.MACDvalue = 0;
+    this.MACDsignal = 0;
+    this.MACDsignalp = 0;
+
     this.lastOrder = null;
     this.timeToClose = null;
     // Stock that the algo will trade.
@@ -189,6 +201,7 @@ class JakesCode {
       this.runningAverage += bar.closePrice;
     });
     this.runningAverage /= 20;
+    writeToEventLog(bars);
 
     if (currPrice > this.runningAverage) {
       // Sell our position if the price is above the running average, if any.
@@ -320,5 +333,99 @@ class JakesCode {
           "| not sent."
       );
     }
+  }
+
+  async testing() {
+    var bars;
+    var plot_bars = [];
+    var plot_EMA12 = [];
+    var plot_EMA26 = [];
+    var plot_MACD = [];
+    var plot_MACDsignal = [];
+    var loopCounter = 0;
+    await this.alpaca
+      .getBars("minute", this.stock, {
+        limit: 150,
+      })
+      .then((resp) => {
+        bars = resp[this.stock];
+      })
+      .catch((err) => {
+        writeToEventLog(err.error);
+      });
+    var currPrice = bars[bars.length - 1].c;
+
+    bars.forEach((bar) => {
+      // Calculate EMA12
+      if (loopCounter > 12) {
+        this.EMA12 = (bar.c - this.EMA12p) * (2 / (12 + 1)) + this.EMA12p;
+        this.EMA12p = this.EMA12;
+        plot_EMA12[loopCounter] = { x: loopCounter, y: this.EMA12 };
+      } else {
+        this.SMA12 += bar.c;
+        if (loopCounter == 12 - 1) {
+          this.SMA12 /= 12;
+          this.EMA12p = this.SMA12;
+        }
+      }
+      // Calculate EMA26
+      if (loopCounter > 26) {
+        this.EMA26 = (bar.c - this.EMA26p) * (2 / (26 + 1)) + this.EMA26p;
+        this.EMA26p = this.EMA26;
+        plot_EMA26[loopCounter] = { x: loopCounter, y: this.EMA26 };
+      } else {
+        this.SMA26 += bar.c;
+        if (loopCounter == 26 - 1) {
+          this.SMA26 /= 26;
+          this.EMA26p = this.SMA26;
+        }
+      }
+
+      this.MACDvalue = this.EMA12 - this.EMA26;
+      if (loopCounter > (26 + 9)) {
+        // Calculate MACD value and signal
+        this.MACDsignal =
+          (this.MACDvalue - this.MACDsignalp) * (2 / (9 + 1)) +
+          this.MACDsignalp;
+        this.MACDsignalp = this.MACDsignal;
+        plot_MACDsignal[loopCounter] = { x: loopCounter, y: this.MACDsignal };
+      } else {
+        this.MACDsignalSMA += this.MACDvalue;
+        if (loopCounter == 26 + 9 - 1) {
+          this.MACDsignalSMA /= 9;
+          this.MACDsignalp = this.MACDsignal;
+        }
+      }
+
+      plot_bars[loopCounter] = { x: loopCounter, y: bar.c };
+      plot_MACD[loopCounter] = { x: loopCounter, y: this.MACDvalue };
+      writeToEventLog(
+        loopCounter +
+          " | " +
+          bar.c +
+          " | " +
+          this.EMA12 +
+          " | " +
+          this.EMA26 +
+          " | " +
+          this.MACDvalue +
+          " | " +
+          this.MACDsignal
+      );
+      loopCounter += 1;
+    });
+
+    writeToEventLog(plot_bars[plot_bars.length - 1].y);
+    writeToEventLog(plot_EMA12[plot_EMA12.length - 1].y);
+    writeToEventLog(plot_EMA26[plot_EMA26.length - 1].y);
+    writeToEventLog(plot_MACD[plot_MACD.length - 1].y);
+
+    //theChart = document.getElementById('chart');
+    //plotly.newplot(document.getElementById('chart'),plot_bars);
+
+    var myIDstring = JSON.stringify(plot_MACD, null, 1);
+    document.querySelector(".log-info").innerHTML = myIDstring;
+
+    //writeToEventLog(bars)
   }
 }

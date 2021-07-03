@@ -10,26 +10,41 @@
     <script src="./JakesScript_browser.js"></script>
     <script src="./lib/cors-api.js"></script>
     <script src="./JakesAlpaca_forBrowser.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.2.0.min.js"></script>
   </head>
   <body>
-    
     <div class="grid-container">
-    <p class="theTitle">Jake's Alpaca | Paper Trades</p>
-    <button type="button" class="btn start" onclick="run_run();">Run Script</button>
-    <button type="button" class="btn stop" onclick="run_stop();">Stop Script</button>
+      <p class="theTitle">Jake's Alpaca | Paper Trades</p>
+      <button type="button" class="btn start" onclick="run_run();">
+        Run Script
+      </button>
+      <button type="button" class="btn stop" onclick="run_stop();">
+        Stop Script
+      </button>
+      <button type="button" class="btn getAccount" onclick="run_myAccount();">
+        Get Account Info
+      </button>
 
-    <pre class="log-output"></pre>
-    <pre class="log-info"></pre>
+      <pre class="log-output"></pre>
+      <pre class="log-info"></pre>
+      <div id="chart"></div>
 
-    <div class="div-input">
-      Ticker: <input class="input" id="ticker" type="text" placeholder="AAPL" />
-      <br />
-      Quantity: <input class="input" id="qty" type="text" placeholder="10" />
+      <div class="div-input">
+        Ticker:
+        <input class="input" id="ticker" type="text" placeholder="AAPL" />
+        <br />
+        Quantity: <input class="input" id="qty" type="text" placeholder="10" />
+      </div>
+
+      <button type="button" class="btn submit" onclick="run_submitOrder();">
+        Submit Order
+      </button>
+      <button type="button" class="btn cancel" onclick="run_cancelAll();">
+        Cancel All
+      </button>
+      <button type="button" class="btn test" onclick="testing_function();">
+        test
+      </button>
     </div>
-      
-    <button type="button" class="btn submit" onclick="run_submitOrder();">Submit Order</button>
-    <button type="button" class="btn cancel" onclick="run_cancelAll();">Cancel All</button>
-    <button type="button" class="btn getAccount" onclick="run_myAccount();">Get Account Info</button>
-
   </body>
 </html>

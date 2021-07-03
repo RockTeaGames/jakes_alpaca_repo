@@ -6,7 +6,20 @@ class JakesCode {
       paper: PAPER,
       baseUrl: "https://paper-api.alpaca.markets",
     });
-    this.runningAverage = 0;
+    this.SMA12 = 0;
+    this.EMA12 = 0;
+    this.EMA12p = 0;
+
+    this.SMA26 = 0;
+    this.EMA26 = 0;
+    this.EMA26p = 0;
+
+    this.MACDsignalSMA = 0;
+    this.MACDvalue = 0;
+    this.MACDsignal = 0;
+    this.MACDsignalp = 0;
+    this.MACDgo = 0;
+
     this.lastOrder = null;
     this.timeToClose = null;
     // Stock that the algo will trade.
@@ -157,7 +170,7 @@ class JakesCode {
   }
 
   // Rebalance our position after an update.
-  async rebalance() {
+  async rebalance2() {
     var positionQuantity = 0;
     var positionValue = 0;
 
@@ -189,6 +202,7 @@ class JakesCode {
       this.runningAverage += bar.closePrice;
     });
     this.runningAverage /= 20;
+    writeToEventLog(bars);
 
     if (currPrice > this.runningAverage) {
       // Sell our position if the price is above the running average, if any.
@@ -321,4 +335,135 @@ class JakesCode {
       );
     }
   }
+
+  async rebalance() {
+    var bars;
+    var plot_bars = { x: [], y: [], name: "bars" };
+    var plot_EMA12 = { x: [], y: [], name: "EMA12" };
+    var plot_EMA26 = { x: [], y: [], name: "EMA26" };
+    var plot_MACD = { x: [], y: [], name: "MACD", yaxis: "y2" };
+    var plot_MACDsignal = { x: [], y: [], name: "MACD Signal", yaxis: "y2" };
+    var plot_MACDgo = { x: [], y: [], name: "Go-Nogo", yaxis: "y3", type:'bar' };
+    var loopCounter = 0;
+    await this.alpaca
+      .getBars("minute", this.stock, {
+        limit: 500,
+      })
+      .then((resp) => {
+        bars = resp[this.stock];
+      })
+      .catch((err) => {
+        writeToEventLog(err.error);
+      });
+    var currPrice = bars[bars.length - 1].c;
+
+    bars.forEach((bar) => {
+      // Calculate EMA12
+      if (loopCounter > 12) {
+        this.EMA12 = (bar.c - this.EMA12p) * (2 / (12 + 1)) + this.EMA12p;
+        this.EMA12p = this.EMA12;
+        plot_EMA12.x.push(loopCounter);
+        plot_EMA12.y.push(this.EMA12);
+      } else {
+        this.SMA12 += bar.c;
+        if (loopCounter == 12 - 1) {
+          this.SMA12 /= 12;
+          this.EMA12p = this.SMA12;
+        }
+      }
+
+      // Calculate EMA26
+      if (loopCounter > 26) {
+        this.EMA26 = (bar.c - this.EMA26p) * (2 / (26 + 1)) + this.EMA26p;
+        this.EMA26p = this.EMA26;
+        plot_EMA26.x.push(loopCounter);
+        plot_EMA26.y.push(this.EMA26);
+      } else {
+        this.SMA26 += bar.c;
+        if (loopCounter == 26 - 1) {
+          this.SMA26 /= 26;
+          this.EMA26p = this.SMA26;
+        }
+      }
+
+      if (loopCounter > 35) {
+        // Calculate MACD value and signal
+        this.MACDvalue = this.EMA12 - this.EMA26;
+        plot_MACD.x.push(loopCounter);
+        plot_MACD.y.push(this.MACDvalue);
+        this.MACDsignal =
+          (this.MACDvalue - this.MACDsignalp) * (2 / (9 + 1)) +
+          this.MACDsignalp;
+        this.MACDsignalp = this.MACDsignal;
+        plot_MACDsignal.x.push(loopCounter);
+        plot_MACDsignal.y.push(this.MACDsignal);
+
+        plot_MACDgo.x.push(loopCounter);
+        plot_MACDgo.y.push(this.MACDgo);
+        this.MACDgo = this.MACDvalue - this.MACDsignal;
+      } else {
+        this.MACDsignalSMA += this.EMA12 - this.EMA26;
+        if (loopCounter == 35 - 1) {
+          this.MACDsignalSMA /= 9;
+          this.MACDsignalp = this.MACDsignal;
+        }
+      }
+
+      plot_bars.x.push(loopCounter);
+      plot_bars.y.push(bar.c);
+
+      /*
+      writeToEventLog(
+        loopCounter +
+          " | " +
+          bar.c +
+          " | " +
+          this.EMA12 +
+          " | " +
+          this.EMA26 +
+          " | " +
+          this.MACDvalue +
+          " | " +
+          this.MACDsignal
+      );
+      */
+      loopCounter += 1;
+    });
+
+    /*
+    writeToEventLog(plot_bars.y[plot_bars.y.length - 1]);
+    writeToEventLog(plot_EMA12[plot_EMA12.length - 1].y);
+    writeToEventLog(plot_EMA26[plot_EMA26.length - 1].y);
+    writeToEventLog(plot_MACD[plot_MACD.length - 1].y);
+    */
+
+    //console.log(plot_bars.x);
+    createChart([
+      plot_bars,
+      plot_EMA12,
+      plot_EMA26,
+      plot_MACD,
+      plot_MACDsignal,
+      plot_MACDgo,
+    ]);
+    //theChart = document.getElementById('chart');
+    //plotly.newplot(document.getElementById('chart'),plot_bars);
+
+    //var myIDstring = JSON.stringify(plot_MACD, null, 1);
+    //document.querySelector(".log-info").innerHTML = myIDstring;
+
+    //writeToEventLog(bars)
+  }
 }
+/*
+if (amountToAdd > 0) {
+  if (amountToAdd > buyingPower) amountToAdd = buyingPower;
+  var qtyToBuy = Math.floor(amountToAdd / currPrice);
+  await this.submitLimitOrder(qtyToBuy, this.stock, currPrice, "buy");
+} else {
+  amountToAdd *= -1;
+  var qtyToSell = Math.floor(amountToAdd / currPrice);
+  if (qtyToSell > positionQuantity) qtyToSell = positionQuantity;
+  await this.submitLimitOrder(qtyToSell, this.stock, currPrice, "sell");
+}
+*/

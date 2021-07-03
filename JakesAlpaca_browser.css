@@ -17,7 +17,7 @@ body{
 .log-output,
 .log-info {
   display: grid; 
-  height: 15em;
+  height: 25em;
   border: 3px solid darkgreen;
   border-radius: 15px;
   overflow-y: scroll;
@@ -45,7 +45,7 @@ body{
 }
 
 #chart{
-  height: 10em;
+  height: 25em;
   width: 100%;
   grid-row: 3/4;
   grid-column: 1/-1;

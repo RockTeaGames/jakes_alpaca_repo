@@ -7,7 +7,7 @@ const theStock = "AAPL";
 
 class MeanReversion {
   constructor(API_KEY, API_SECRET, PAPER) {
-    this.Alpaca = require("./lib/alpaca-trade-api");
+    this.Alpaca = require("../lib/alpaca-trade-api");
     this.alpaca = new this.Alpaca({
       keyId: API_KEY,
       secretKey: API_SECRET,

@@ -3,7 +3,6 @@ const API_SECRET = "axb4eQ8sQlA9ULzngpc6dZbVwk6i2zArWM4Ow6nH";
 const MINUTE = 60000;
 const PAPER = true;
 var theKill = false;
-const testkey = ${{ secrets.my_API_KEY }};
 
 var theStock_default = "AAPL";
 //var theqty_default = 10;

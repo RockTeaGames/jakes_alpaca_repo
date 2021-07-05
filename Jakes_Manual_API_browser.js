@@ -1,5 +1,5 @@
 class theTest {
-  constructor(API_KEY, API_SECRET, PAPER) {
+  constructor(API_KEY, API_SECRET, PAPER, theStock) {
     this.alpaca = new AlpacaCORS({
       keyId: API_KEY,
       secretKey: API_SECRET,

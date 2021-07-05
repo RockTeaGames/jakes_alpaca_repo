@@ -3,22 +3,30 @@ const API_SECRET = "axb4eQ8sQlA9ULzngpc6dZbVwk6i2zArWM4Ow6nH";
 const MINUTE = 60000;
 const PAPER = true;
 var theKill = false;
+const testkey = ${{ secrets.my_API_KEY }};
 
-const theStock = "AAPL";
-var theticker_default = theStock;
-var theqty_default = 10;
+var theStock_default = "AAPL";
+//var theqty_default = 10;
 
 const testissue = true;
 
 function run_run() {
-  writeToEventLog("Starting Script");
-  var runIt = new JakesCode(API_KEY, API_SECRET);
+  //writeToEventLog("Starting Script");
+  var theStock = document.getElementById("ticker").value;
+  if (theStock == "") {
+    theStock = theStock_default;
+  }
+  var runIt = new JakesCode(API_KEY, API_SECRET, PAPER, theStock);
   runIt.run();
 }
 
 function run_stop() {
   writeToEventLog("Stopping Script");
-  var runIt = new JakesCode(API_KEY, API_SECRET);
+  var theStock = document.getElementById("ticker").value;
+  if (theStock == "") {
+    theStock = theStock_default;
+  }
+  var runIt = new JakesCode(API_KEY, API_SECRET, PAPER, theStock);
   runIt.stopIt();
 }
 
@@ -27,7 +35,7 @@ function run_myAccount() {
   runIt.myaccount();
   //createChart();
 }
-
+/*
 function run_submitOrder() {
   var theticker = document.getElementById("ticker").value;
   var theqty = document.getElementById("qty").value;
@@ -39,7 +47,7 @@ function run_submitOrder() {
     theqty = theqty_default;
   }
 
-  var runIt = new theTest(API_KEY, API_SECRET);
+  var runIt = new theTest(API_KEY, API_SECRET,PAPER,theStock);
   runIt.submitMarketOrder(theqty, theticker, "buy");
   setTimeout(() => {
     run_myAccount();
@@ -47,13 +55,13 @@ function run_submitOrder() {
 }
 
 function run_cancelAll() {
-  var runIt = new theTest(API_KEY, API_SECRET);
+  var runIt = new theTest(API_KEY, API_SECRET,PAPER,theStock);
   runIt.cancelAll();
   setTimeout(() => {
     run_myAccount();
   }, 500);
 }
-
+*/
 function writeToEventLog(text) {
   //console.log(`${text}`);
   var someDiv = document.querySelector(".log-output");
@@ -62,7 +70,7 @@ function writeToEventLog(text) {
   someDiv.scrollTop = someDiv.scrollHeight;
 }
 
-function createChart(chartData,refreshTime) {
+function createChart(chartData, refreshTime) {
   chartObj = document.getElementById("chart");
 
   var chartlayout = {
@@ -84,7 +92,11 @@ function createChart(chartData,refreshTime) {
 
 function manual_rebalance() {
   writeToEventLog("Manual Rebalance Started");
-  var runIt = new JakesCode(API_KEY, API_SECRET);
+  var theStock = document.getElementById("ticker").value;
+  if (theStock == "") {
+    theStock = theStock_default;
+  }
+  var runIt = new JakesCode(API_KEY, API_SECRET, PAPER, theStock);
   runIt.rebalance();
   //writeToEventLog("Manual Rebalance Finished");
 }

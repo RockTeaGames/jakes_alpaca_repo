@@ -1,5 +1,5 @@
 class JakesCode {
-  constructor(API_KEY, API_SECRET, PAPER) {
+  constructor(API_KEY, API_SECRET, PAPER, theStock) {
     this.alpaca = new AlpacaCORS({
       keyId: API_KEY,
       secretKey: API_SECRET,
@@ -29,6 +29,7 @@ class JakesCode {
 
   async run() {
     // First, cancel any existing orders so they don't impact our buying power.
+    writeToEventLog("Starting Script using " + this.stock);
     var orders;
     await this.alpaca
       .getOrders({ status: "open", direction: "asc" })
@@ -43,7 +44,7 @@ class JakesCode {
         .cancelOrder(order.id)
         .then(writeToEventLog("Order " + order.id + " canceled."))
         .catch((err) => {
-          writeToEventLog("Pre-script Cancelling error: " +err.error);
+          writeToEventLog("Pre-script Cancelling error: " + err.error);
         });
     });
     writeToEventLog("Pre-Script Cancelling Finished.");
@@ -75,7 +76,7 @@ class JakesCode {
             );
           }
         } catch (err) {
-          writeToEventLog("check if market open error: " +err.error);
+          writeToEventLog("check if market open error: " + err.error);
         }
       }, MINUTE);
     });
@@ -89,7 +90,7 @@ class JakesCode {
       // Clear the last order so that we only have 1 hanging order.
       if (this.lastOrder != null)
         await this.alpaca.cancelOrder(this.lastOrder.id).catch((err) => {
-          writeToEventLog("cancel last order error: " +err.error);
+          writeToEventLog("cancel last order error: " + err.error);
         });
 
       // Figure out when the market will close so we can prepare to sell beforehand.
@@ -106,7 +107,7 @@ class JakesCode {
           );
         })
         .catch((err) => {
-          writeToEventLog("getClock closing time error: " +err.error);
+          writeToEventLog("getClock closing time error: " + err.error);
         });
       this.timeToClose = closingTime - currTime;
 
@@ -126,7 +127,7 @@ class JakesCode {
               await promOrder;
             })
             .catch((err) => {
-              writeToEventLog("GetPosition to sell 15min error: " +err.error);
+              writeToEventLog("GetPosition to sell 15min error: " + err.error);
             });
         } catch (err) {
           /*console.log(err.error);*/
@@ -273,7 +274,7 @@ class JakesCode {
         bars = resp[this.stock];
       })
       .catch((err) => {
-        writeToEventLog("getBars error: " +err.error);
+        writeToEventLog("getBars error: " + err.error);
       });
     var currPrice = bars[bars.length - 1].c;
 
@@ -346,35 +347,39 @@ class JakesCode {
     //document.querySelector(".log-info").innerHTML = myIDstring;
     var chartTime;
     await this.alpaca
-    .getClock()
-    .then((resp) => {
-      chartTime = new Date(
-        resp.timestamp //.substring(0, resp.timestamp.length - 6)
-      );
-    })
-    .catch((err) => {
-      writeToEventLog("chartTime error: " + err.error);
-    });
-    
-    createChart([
-      plot_bars,
-      plot_EMA12,
-      plot_EMA26,
-      plot_MACD,
-      plot_MACDsignal,
-      plot_MACDgo,
-    ],chartTime);
+      .getClock()
+      .then((resp) => {
+        chartTime = new Date(
+          resp.timestamp //.substring(0, resp.timestamp.length - 6)
+        );
+      })
+      .catch((err) => {
+        writeToEventLog("chartTime error: " + err.error);
+      });
+
+    createChart(
+      [
+        plot_bars,
+        plot_EMA12,
+        plot_EMA26,
+        plot_MACD,
+        plot_MACDsignal,
+        plot_MACDgo,
+      ],
+      chartTime
+    );
 
     // Get our position, if any.
     var positionQuantity = 0;
-    try {
-      await this.alpaca.getPosition(this.stock).then((resp) => {
+    await this.alpaca
+      .getPosition(this.stock)
+      .then((resp) => {
         positionQuantity = resp.qty;
-        //writeToEventLog("Current Position: " + this.stock + " | " + positionQuantity);
+        writeToEventLog("Current Position: " + this.stock + " | " + positionQuantity);
+      })
+      .catch((err) => {
+        console.log(err.error);
       });
-    } catch (err) {
-      console.log(err.error);
-    }
 
     var buyingPower;
     await this.alpaca

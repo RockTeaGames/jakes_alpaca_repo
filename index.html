@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Jake's Alpaca | Paper</title>
     <link rel="stylesheet" type="text/css" href="JakesAlpaca_browser.css" />
+    
     <script src="./Jakes_Manual_API_browser.js"></script>
-    <script src="./JakesScript_browser.js"></script>
+    <script src="./MACDScript_browser.js"></script>
     <script src="./lib/cors-api.js"></script>
     <script src="./JakesAlpaca_forBrowser.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.2.0.min.js"></script>
@@ -15,6 +16,7 @@
   <body>
     <div class="grid-container">
       <p class="theTitle">Jake's Alpaca | Paper Trades</p>
+      <input class="input" id="ticker" type="text" placeholder="AAPL" />
       <button type="button" class="btn start" onclick="run_run();">
         Run Script
       </button>

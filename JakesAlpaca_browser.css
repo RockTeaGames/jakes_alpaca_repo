@@ -8,7 +8,7 @@ body{
 }
 
 .theTitle{
-  grid-column: 1/-1;
+  grid-column: 2/-2;
   text-align: center;
   font-size: 1cm;
   margin: 0;

@@ -19,6 +19,7 @@ class JakesCode {
     this.MACDsignal = 0;
     this.MACDsignalp = 0;
     this.MACDgo = 0;
+    this.MACDgop = 0;
 
     this.lastOrder = null;
     this.timeToClose = null;
@@ -38,12 +39,18 @@ class JakesCode {
         writeToEventLog(err.error);
       });
     orders.forEach(async (order) => {
-      this.alpaca.cancelOrder(order.id).catch((err) => {
-        writeToEventLog(err.error);
-      });
-      writeToEventLog("Order " + order.id + " canceled.");
+      await this.alpaca
+        .cancelOrder(order.id)
+        .then(writeToEventLog("Order " + order.id + " canceled."))
+        .catch((err) => {
+          writeToEventLog("Pre-script Cancelling error: " +err.error);
+        });
     });
     writeToEventLog("Pre-Script Cancelling Finished.");
+
+    await this.alpaca
+      .cancelAllPositions()
+      .then(writeToEventLog("Pre-Script Position Selling Finished."));
 
     var awaitMarketOpen = new Promise((resolve, reject) => {
       var check = setInterval(async () => {
@@ -68,7 +75,7 @@ class JakesCode {
             );
           }
         } catch (err) {
-          writeToEventLog(err.error);
+          writeToEventLog("check if market open error: " +err.error);
         }
       }, MINUTE);
     });
@@ -77,38 +84,12 @@ class JakesCode {
     await awaitMarketOpen;
     writeToEventLog("Market opened!");
 
-    // Get the running average of prices of the last 20 minutes, waiting until we have 20 bars from market open.
-    var promBars = new Promise((resolve, reject) => {
-      var barChecker = setInterval(async () => {
-        await this.alpaca.getCalendar(Date.now()).then(async (resp) => {
-          var marketOpen = resp[0].open;
-          await this.alpaca
-            .getBars("minute", this.stock, {
-              start: marketOpen,
-            })
-            .then((resp) => {
-              var bars = resp[this.stock];
-              if (bars.length >= 20) {
-                clearInterval(barChecker);
-                resolve();
-              }
-            })
-            .catch((err) => {
-              writeToEventLog(err.error);
-            });
-        });
-      }, MINUTE);
-    });
-    writeToEventLog("Waiting for 20 bars...");
-    await promBars;
-    writeToEventLog("We have 20 bars!");
-
-    // Rebalance our portfolio every minute based off running average data.
+    // Rebalance our portfolio every minute based off MACD
     var spin = setInterval(async () => {
       // Clear the last order so that we only have 1 hanging order.
       if (this.lastOrder != null)
         await this.alpaca.cancelOrder(this.lastOrder.id).catch((err) => {
-          writeToEventLog(err.error);
+          writeToEventLog("cancel last order error: " +err.error);
         });
 
       // Figure out when the market will close so we can prepare to sell beforehand.
@@ -125,7 +106,7 @@ class JakesCode {
           );
         })
         .catch((err) => {
-          writeToEventLog(err.error);
+          writeToEventLog("getClock closing time error: " +err.error);
         });
       this.timeToClose = closingTime - currTime;
 
@@ -145,7 +126,7 @@ class JakesCode {
               await promOrder;
             })
             .catch((err) => {
-              writeToEventLog(err.error);
+              writeToEventLog("GetPosition to sell 15min error: " +err.error);
             });
         } catch (err) {
           /*console.log(err.error);*/
@@ -167,84 +148,11 @@ class JakesCode {
     theKill = true;
     clearInterval(this.spin);
     clearInterval(this.barChecker);
-  }
 
-  // Rebalance our position after an update.
-  async rebalance2() {
-    var positionQuantity = 0;
-    var positionValue = 0;
-
-    // Get our position, if any.
-    try {
-      await this.alpaca.getPosition(this.stock).then((resp) => {
-        positionQuantity = resp.qty;
-        positionValue = resp.market_value;
-      });
-    } catch (err) {
-      writeToEventLog(err.error);
-    }
-
-    // Get the new updated price and running average.
-    var bars;
-    await this.alpaca
-      .getBars("minute", this.stock, {
-        limit: 20,
-      })
-      .then((resp) => {
-        bars = resp[this.stock];
-      })
-      .catch((err) => {
-        writeToEventLog(err.error);
-      });
-    var currPrice = bars[bars.length - 1].closePrice;
-    this.runningAverage = 0;
-    bars.forEach((bar) => {
-      this.runningAverage += bar.closePrice;
+    await this.alpaca.cancelAllPositions().then((resp) => {
+      var myIDstring = JSON.stringify(resp, null, 1);
+      document.querySelector(".log-info").innerHTML = myIDstring;
     });
-    this.runningAverage /= 20;
-    writeToEventLog(bars);
-
-    if (currPrice > this.runningAverage) {
-      // Sell our position if the price is above the running average, if any.
-      if (positionQuantity > 0) {
-        writeToEventLog("Setting position to zero.");
-        await this.submitLimitOrder(
-          positionQuantity,
-          this.stock,
-          currPrice,
-          "sell"
-        );
-      } else writeToEventLog("No position in the stock.  No action required.");
-    } else if (currPrice < this.runningAverage) {
-      // Determine optimal amount of shares based on portfolio and market data.
-      var portfolioValue;
-      var buyingPower;
-      await this.alpaca
-        .getAccount()
-        .then((resp) => {
-          portfolioValue = resp.portfolio_value;
-          buyingPower = resp.buying_power;
-        })
-        .catch((err) => {
-          writeToEventLog(err.error);
-        });
-      var portfolioShare =
-        ((this.runningAverage - currPrice) / currPrice) * 200;
-      var targetPositionValue = portfolioValue * portfolioShare;
-      var amountToAdd = targetPositionValue - positionValue;
-
-      // Add to our position, constrained by our buying power; or, sell down to optimal amount of shares.
-      if (amountToAdd > 0) {
-        if (amountToAdd > buyingPower) amountToAdd = buyingPower;
-        var qtyToBuy = Math.floor(amountToAdd / currPrice);
-        await this.submitLimitOrder(qtyToBuy, this.stock, currPrice, "buy");
-      } else {
-        amountToAdd *= -1;
-        var qtyToSell = Math.floor(amountToAdd / currPrice);
-        if (qtyToSell > positionQuantity) qtyToSell = positionQuantity;
-        await this.submitLimitOrder(qtyToSell, this.stock, currPrice, "sell");
-      }
-    }
   }
 
   // Submit a limit order if quantity is above 0.
@@ -341,9 +249,21 @@ class JakesCode {
     var plot_bars = { x: [], y: [], name: "bars" };
     var plot_EMA12 = { x: [], y: [], name: "EMA12" };
     var plot_EMA26 = { x: [], y: [], name: "EMA26" };
+
     var plot_MACD = { x: [], y: [], name: "MACD", yaxis: "y2" };
     var plot_MACDsignal = { x: [], y: [], name: "MACD Signal", yaxis: "y2" };
-    var plot_MACDgo = { x: [], y: [], name: "Go-Nogo", yaxis: "y3", type:'bar' };
+
+    var MACDgoColor = "rgba(0,0,0,0)";
+    var plot_MACDgoColor = [];
+    var plot_MACDgo = {
+      x: [],
+      y: [],
+      name: "Buy-Sell",
+      yaxis: "y3",
+      type: "bar",
+      marker: { color: plot_MACDgoColor },
+    };
+
     var loopCounter = 0;
     await this.alpaca
       .getBars("minute", this.stock, {
@@ -353,7 +273,7 @@ class JakesCode {
         bars = resp[this.stock];
       })
       .catch((err) => {
-        writeToEventLog(err.error);
+        writeToEventLog("getBars error: " +err.error);
       });
     var currPrice = bars[bars.length - 1].c;
 
@@ -386,8 +306,8 @@ class JakesCode {
         }
       }
 
+      // Calculate MACD value and signal
       if (loopCounter > 35) {
-        // Calculate MACD value and signal
         this.MACDvalue = this.EMA12 - this.EMA26;
         plot_MACD.x.push(loopCounter);
         plot_MACD.y.push(this.MACDvalue);
@@ -397,10 +317,17 @@ class JakesCode {
         this.MACDsignalp = this.MACDsignal;
         plot_MACDsignal.x.push(loopCounter);
         plot_MACDsignal.y.push(this.MACDsignal);
-
+        this.MACDgop = this.MACDgo;
+        this.MACDgo = this.MACDvalue - this.MACDsignal;
         plot_MACDgo.x.push(loopCounter);
         plot_MACDgo.y.push(this.MACDgo);
-        this.MACDgo = this.MACDvalue - this.MACDsignal;
+
+        if (this.MACDgo < 0) {
+          MACDgoColor = "rgba(220,0,0,0.75)";
+        } else {
+          MACDgoColor = "rgba(0,220,0,0.75)";
+        }
+        plot_MACDgoColor.push(MACDgoColor);
       } else {
         this.MACDsignalSMA += this.EMA12 - this.EMA26;
         if (loopCounter == 35 - 1) {
@@ -412,32 +339,23 @@ class JakesCode {
       plot_bars.x.push(loopCounter);
       plot_bars.y.push(bar.c);
 
-      /*
-      writeToEventLog(
-        loopCounter +
-          " | " +
-          bar.c +
-          " | " +
-          this.EMA12 +
-          " | " +
-          this.EMA26 +
-          " | " +
-          this.MACDvalue +
-          " | " +
-          this.MACDsignal
-      );
-      */
       loopCounter += 1;
     });
 
-    /*
-    writeToEventLog(plot_bars.y[plot_bars.y.length - 1]);
-    writeToEventLog(plot_EMA12[plot_EMA12.length - 1].y);
-    writeToEventLog(plot_EMA26[plot_EMA26.length - 1].y);
-    writeToEventLog(plot_MACD[plot_MACD.length - 1].y);
-    */
-
-    //console.log(plot_bars.x);
+    //var myIDstring = JSON.stringify(plot_MACDgo, null, 1);
+    //document.querySelector(".log-info").innerHTML = myIDstring;
+    var chartTime;
+    await this.alpaca
+    .getClock()
+    .then((resp) => {
+      chartTime = new Date(
+        resp.timestamp //.substring(0, resp.timestamp.length - 6)
+      );
+    })
+    .catch((err) => {
+      writeToEventLog("chartTime error: " + err.error);
+    });
+    
     createChart([
       plot_bars,
       plot_EMA12,
@@ -445,25 +363,56 @@ class JakesCode {
       plot_MACD,
       plot_MACDsignal,
       plot_MACDgo,
-    ]);
-    //theChart = document.getElementById('chart');
-    //plotly.newplot(document.getElementById('chart'),plot_bars);
+    ],chartTime);
 
-    //var myIDstring = JSON.stringify(plot_MACD, null, 1);
-    //document.querySelector(".log-info").innerHTML = myIDstring;
+    // Get our position, if any.
+    var positionQuantity = 0;
+    try {
+      await this.alpaca.getPosition(this.stock).then((resp) => {
+        positionQuantity = resp.qty;
+        //writeToEventLog("Current Position: " + this.stock + " | " + positionQuantity);
+      });
+    } catch (err) {
+      console.log(err.error);
+    }
 
-    //writeToEventLog(bars)
+    var buyingPower;
+    await this.alpaca
+      .getAccount()
+      .then((resp) => {
+        buyingPower = resp.buying_power;
+        //writeToEventLog("Buying Power: "+ buyingPower);
+      })
+      .catch((err) => {
+        console.log(err.error);
+      });
+
+    if (this.MACDgo > 0 && this.MACDgop < 0) {
+      // negative to positive - buy condition
+      var qtyToBuy = Math.floor(buyingPower / currPrice);
+      writeToEventLog(
+        "Positive | Buying " +
+          qtyToBuy +
+          " shares of " +
+          this.stock +
+          " @ " +
+          currPrice
+      );
+      await this.submitLimitOrder(qtyToBuy, this.stock, currPrice, "buy");
+    } else if (this.MACDgo < 0 && this.MACDgop > 0) {
+      // positive to negative - sell condition
+      writeToEventLog(
+        "Negative | Closing all " +
+          positionQuantity +
+          " shares of " +
+          this.stock +
+          " @ " +
+          currPrice
+      );
+      await this.submitMarketOrder(positionQuantity, this.stock, "sell");
+      //await this.alpaca.cancelAllPositions();
+    } else {
+      //writeToEventLog("");
+    }
   }
 }
-/*
-if (amountToAdd > 0) {
-  if (amountToAdd > buyingPower) amountToAdd = buyingPower;
-  var qtyToBuy = Math.floor(amountToAdd / currPrice);
-  await this.submitLimitOrder(qtyToBuy, this.stock, currPrice, "buy");
-} else {
-  amountToAdd *= -1;
-  var qtyToSell = Math.floor(amountToAdd / currPrice);
-  if (qtyToSell > positionQuantity) qtyToSell = positionQuantity;
-  await this.submitLimitOrder(qtyToSell, this.stock, currPrice, "sell");
-}
-*/

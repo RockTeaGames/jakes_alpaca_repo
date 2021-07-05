@@ -62,19 +62,18 @@ function writeToEventLog(text) {
   someDiv.scrollTop = someDiv.scrollHeight;
 }
 
-function createChart(chartData) {
+function createChart(chartData,refreshTime) {
   chartObj = document.getElementById("chart");
 
   var chartlayout = {
-    //title: "Jakes Alpaca Chart",
-    margin: { t: 30, b: 30 },
+    title: "Refreshed: " + refreshTime,
+    margin: { t: 30, b: 30, l: 45, r: 30 },
     layout: {
       plot_bgcolor: "rgba(0,0,0,0)",
       paper_bgcolor: "rgba(0,0,0,0)",
     },
     grid: {
       rows: 3,
-      row_width:[0.6,0.2,0.2],
       columns: 1,
       roworder: "top to bottom",
     },
@@ -83,8 +82,9 @@ function createChart(chartData) {
   Plotly.newPlot(chartObj, chartData, chartlayout);
 }
 
-function testing_function() {
-  writeToEventLog("Running test..");
+function manual_rebalance() {
+  writeToEventLog("Manual Rebalance Started");
   var runIt = new JakesCode(API_KEY, API_SECRET);
   runIt.rebalance();
+  //writeToEventLog("Manual Rebalance Finished");
 }

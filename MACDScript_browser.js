@@ -351,7 +351,7 @@ class JakesCode {
 
       loopCounter += 1;
     });
-    writeToEventLog(bar.c+ " | " +EMA12+ " | " +EMA12p+ " | " +EMA26+ " | " +EMA26p+ " | " +MACDvalue+ " | " +MACDvalue+ " | " +MACDsignal+ " | " +MACDsignalp+ " | " +MACDgo+ " | " +MACDgop);
+    writeToEventLog(currPrice+ " | " +EMA12+ " | " +EMA12p+ " | " +EMA26+ " | " +EMA26p+ " | " +MACDvalue+ " | " +MACDvalue+ " | " +MACDsignal+ " | " +MACDsignalp+ " | " +MACDgo+ " | " +MACDgop);
     //var myIDstring = JSON.stringify(plot_MACDgo, null, 1);
     //document.querySelector(".log-info").innerHTML = myIDstring;
     createChart(

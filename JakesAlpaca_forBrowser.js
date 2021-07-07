@@ -1,5 +1,5 @@
-const API_KEY = "PKSSJH4T5HZL15DXGM49";
-const API_SECRET = "axb4eQ8sQlA9ULzngpc6dZbVwk6i2zArWM4Ow6nH";
+const API_KEY = "PKDSBV3IAVADYZVKMIOT";
+const API_SECRET = "Fm6mMt7Ghh3QK2HBm4xtASacoqdABpWoboJOsdK2";
 const MINUTE = 60000;
 const PAPER = true;
 var theKill = false;
@@ -27,6 +27,15 @@ function run_stop() {
   }
   var runIt = new JakesCode(API_KEY, API_SECRET, PAPER, theStock);
   runIt.stopIt();
+  //send_logEmail();
+}
+
+function send_logEmail(){
+  var email_to = "rochteja@outlook.com";
+  var email_Subject = "Alpaca String Log | " + Date();
+  var email_Body = document.querySelector('.log-output').innerHTML.replace(/<br>/g,' %0D ');
+  //console.log(email_Body.length)
+  window.open('mailto:'+ email_to +'?subject=' + email_Subject + '&body=' + email_Body)
 }
 
 function run_myAccount() {

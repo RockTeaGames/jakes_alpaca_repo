@@ -6,22 +6,11 @@ class JakesCode {
       paper: PAPER,
       baseUrl: "https://paper-api.alpaca.markets",
     });
-    this.SMA12 = 0;
-    this.EMA12 = 0;
-    this.EMA12p = 0;
-
-    this.SMA26 = 0;
-    this.EMA26 = 0;
-    this.EMA26p = 0;
-
-    this.MACDsignalSMA = 0;
-    this.MACDvalue = 0;
-    this.MACDsignal = 0;
-    this.MACDsignalp = 0;
-    this.MACDgo = 0;
-    this.MACDgop = 0;
 
     this.lastOrder = null;
+    this.timeToOpen = null;
+    this.hoursToOpen = null;
+    this.minsToOpen = null;
     this.timeToClose = null;
     // Stock that the algo will trade.
     this.stock = theStock;
@@ -70,10 +59,16 @@ class JakesCode {
             let currTime = new Date(
               clock.timestamp.substring(0, clock.timestamp.length - 6)
             );
-            this.timeToClose = Math.floor((openTime - currTime) / 1000 / 60);
+            this.timeToOpen = Math.floor((openTime - currTime) / 1000 / 60);
+            this.hoursToOpen = Math.floor(this.timeToOpen / 60);
+            this.minsToOpen = this.timeToOpen - this.hoursToOpen * 60;
             writeToEventLog(
-              `${this.timeToClose} minutes til next market open.`
+              this.hoursToOpen +
+                " hours, " +
+                this.minsToOpen +
+                " minutes until next market open."
             );
+            //writeToEventLog(`${this.timeToOpen} minutes til next market open.`);
           }
         } catch (err) {
           writeToEventLog("check if market open error: " + err.error);
@@ -248,12 +243,26 @@ class JakesCode {
   async rebalance() {
     var bars;
     var plot_bars = { x: [], y: [], name: "bars" };
+
+    var SMA12 = 0;
+    var EMA12 = 0;
+    var EMA12p = 0;
     var plot_EMA12 = { x: [], y: [], name: "EMA12" };
+
+    var SMA26 = 0;
+    var EMA26 = 0;
+    var EMA26p = 0;
     var plot_EMA26 = { x: [], y: [], name: "EMA26" };
 
+    var MACDsignalSMA = 0;
+    var MACDvalue = 0;
     var plot_MACD = { x: [], y: [], name: "MACD", yaxis: "y2" };
+    var MACDsignal = 0;
+    var MACDsignalp = 0;
     var plot_MACDsignal = { x: [], y: [], name: "MACD Signal", yaxis: "y2" };
 
+    var MACDgo = 0;
+    var MACDgop = 0;
     var MACDgoColor = "rgba(0,0,0,0)";
     var plot_MACDgoColor = [];
     var plot_MACDgo = {
@@ -281,59 +290,59 @@ class JakesCode {
     bars.forEach((bar) => {
       // Calculate EMA12
       if (loopCounter > 12) {
-        this.EMA12 = (bar.c - this.EMA12p) * (2 / (12 + 1)) + this.EMA12p;
-        this.EMA12p = this.EMA12;
+        EMA12 = (bar.c - EMA12p) * (2 / (12 + 1)) + EMA12p;
+        EMA12p = EMA12;
         plot_EMA12.x.push(loopCounter);
-        plot_EMA12.y.push(this.EMA12);
+        plot_EMA12.y.push(EMA12);
       } else {
-        this.SMA12 += bar.c;
+        SMA12 += bar.c;
         if (loopCounter == 12 - 1) {
-          this.SMA12 /= 12;
-          this.EMA12p = this.SMA12;
+          SMA12 /= 12;
+          EMA12p = SMA12;
         }
       }
 
       // Calculate EMA26
       if (loopCounter > 26) {
-        this.EMA26 = (bar.c - this.EMA26p) * (2 / (26 + 1)) + this.EMA26p;
-        this.EMA26p = this.EMA26;
+        EMA26 = (bar.c - EMA26p) * (2 / (26 + 1)) + EMA26p;
+        EMA26p = EMA26;
         plot_EMA26.x.push(loopCounter);
-        plot_EMA26.y.push(this.EMA26);
+        plot_EMA26.y.push(EMA26);
       } else {
-        this.SMA26 += bar.c;
+        SMA26 += bar.c;
         if (loopCounter == 26 - 1) {
-          this.SMA26 /= 26;
-          this.EMA26p = this.SMA26;
+          SMA26 /= 26;
+          EMA26p = SMA26;
         }
       }
 
       // Calculate MACD value and signal
       if (loopCounter > 35) {
-        this.MACDvalue = this.EMA12 - this.EMA26;
+        MACDvalue = EMA12 - EMA26;
         plot_MACD.x.push(loopCounter);
-        plot_MACD.y.push(this.MACDvalue);
-        this.MACDsignal =
-          (this.MACDvalue - this.MACDsignalp) * (2 / (9 + 1)) +
-          this.MACDsignalp;
-        this.MACDsignalp = this.MACDsignal;
+        plot_MACD.y.push(MACDvalue);
+        MACDsignal =
+          (MACDvalue - MACDsignalp) * (2 / (9 + 1)) +
+          MACDsignalp;
+        MACDsignalp = MACDsignal;
         plot_MACDsignal.x.push(loopCounter);
-        plot_MACDsignal.y.push(this.MACDsignal);
-        this.MACDgop = this.MACDgo;
-        this.MACDgo = this.MACDvalue - this.MACDsignal;
+        plot_MACDsignal.y.push(MACDsignal);
+        MACDgop = MACDgo;
+        MACDgo = MACDvalue - MACDsignal;
         plot_MACDgo.x.push(loopCounter);
-        plot_MACDgo.y.push(this.MACDgo);
+        plot_MACDgo.y.push(MACDgo);
 
-        if (this.MACDgo < 0) {
+        if (MACDgo < 0) {
           MACDgoColor = "rgba(220,0,0,0.75)";
         } else {
           MACDgoColor = "rgba(0,220,0,0.75)";
         }
         plot_MACDgoColor.push(MACDgoColor);
       } else {
-        this.MACDsignalSMA += this.EMA12 - this.EMA26;
+        MACDsignalSMA += EMA12 - EMA26;
         if (loopCounter == 35 - 1) {
-          this.MACDsignalSMA /= 9;
-          this.MACDsignalp = this.MACDsignal;
+          MACDsignalSMA /= 9;
+          MACDsignalp = MACDsignal;
         }
       }
 
@@ -345,18 +354,6 @@ class JakesCode {
 
     //var myIDstring = JSON.stringify(plot_MACDgo, null, 1);
     //document.querySelector(".log-info").innerHTML = myIDstring;
-    var chartTime;
-    await this.alpaca
-      .getClock()
-      .then((resp) => {
-        chartTime = new Date(
-          resp.timestamp //.substring(0, resp.timestamp.length - 6)
-        );
-      })
-      .catch((err) => {
-        writeToEventLog("chartTime error: " + err.error);
-      });
-
     createChart(
       [
         plot_bars,
@@ -366,7 +363,7 @@ class JakesCode {
         plot_MACDsignal,
         plot_MACDgo,
       ],
-      chartTime
+      Date()
     );
 
     // Get our position, if any.
@@ -375,7 +372,9 @@ class JakesCode {
       .getPosition(this.stock)
       .then((resp) => {
         positionQuantity = resp.qty;
-        writeToEventLog("Current Position: " + this.stock + " | " + positionQuantity);
+        writeToEventLog(
+          "Current Position: " + this.stock + " | " + positionQuantity
+        );
       })
       .catch((err) => {
         console.log(err.error);

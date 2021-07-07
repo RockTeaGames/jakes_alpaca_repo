@@ -351,7 +351,7 @@ class JakesCode {
 
       loopCounter += 1;
     });
-
+    writeToEventLog(bar.c+ " | " +EMA12+ " | " +EMA12p+ " | " +EMA26+ " | " +EMA26p+ " | " +MACDvalue+ " | " +MACDvalue+ " | " +MACDsignal+ " | " +MACDsignalp+ " | " +MACDgo+ " | " +MACDgop);
     //var myIDstring = JSON.stringify(plot_MACDgo, null, 1);
     //document.querySelector(".log-info").innerHTML = myIDstring;
     createChart(
@@ -372,7 +372,7 @@ class JakesCode {
       .getPosition(this.stock)
       .then((resp) => {
         positionQuantity = resp.qty;
-        //writeToEventLog("Current Position: " + this.stock + " | " + positionQuantity);
+        writeToEventLog("Current Position: " + this.stock + " | " + positionQuantity);
       })
       .catch((err) => {
         console.log(err.error);
@@ -383,7 +383,7 @@ class JakesCode {
       .getAccount()
       .then((resp) => {
         buyingPower = resp.buying_power;
-        //writeToEventLog("Buying Power: "+ buyingPower);
+        writeToEventLog("Buying Power: "+ buyingPower);
       })
       .catch((err) => {
         console.log(err.error);

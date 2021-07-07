@@ -372,9 +372,7 @@ class JakesCode {
       .getPosition(this.stock)
       .then((resp) => {
         positionQuantity = resp.qty;
-        writeToEventLog(
-          "Current Position: " + this.stock + " | " + positionQuantity
-        );
+        //writeToEventLog("Current Position: " + this.stock + " | " + positionQuantity);
       })
       .catch((err) => {
         console.log(err.error);

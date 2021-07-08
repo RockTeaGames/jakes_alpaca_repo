@@ -4,10 +4,14 @@ const MINUTE = 60000;
 const PAPER = true;
 var theKill = false;
 
-var theStock_default = "AAPL";
+var theStock_default = "GPRO";
 //var theqty_default = 10;
 
 const testissue = true;
+
+function set_default_stock(){
+  document.getElementById("ticker").placeholder = theStock_default;
+}
 
 function run_run() {
   //writeToEventLog("Starting Script");

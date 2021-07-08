@@ -277,7 +277,7 @@ class JakesCode {
     var loopCounter = 0;
     await this.alpaca
       .getBars("minute", this.stock, {
-        limit: 500,
+        limit: 50,
       })
       .then((resp) => {
         bars = resp[this.stock];
@@ -339,19 +339,20 @@ class JakesCode {
         }
         plot_MACDgoColor.push(MACDgoColor);
       } else {
-        MACDsignalSMA += EMA12 - EMA26;
+        MACDsignalSMA += (EMA12 - EMA26);
         if (loopCounter == 35 - 1) {
           MACDsignalSMA /= 9;
-          MACDsignalp = MACDsignal;
+          MACDsignalp = MACDsignalSMA;
         }
       }
 
       plot_bars.x.push(loopCounter);
       plot_bars.y.push(bar.c);
-
+      writeToEventLog(bar.c+ " | " +EMA12+ " | " +EMA12p+ " | " +EMA26+ " | " +EMA26p+ " | " +MACDvalue+ " | " +MACDvalue+ " | " +MACDsignal+ " | " +MACDsignalp+ " | " +MACDgo+ " | " +MACDgop);
+      
       loopCounter += 1;
     });
-    writeToEventLog(currPrice+ " | " +EMA12+ " | " +EMA12p+ " | " +EMA26+ " | " +EMA26p+ " | " +MACDvalue+ " | " +MACDvalue+ " | " +MACDsignal+ " | " +MACDsignalp+ " | " +MACDgo+ " | " +MACDgop);
+    
     //var myIDstring = JSON.stringify(plot_MACDgo, null, 1);
     //document.querySelector(".log-info").innerHTML = myIDstring;
     createChart(

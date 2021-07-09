@@ -244,17 +244,17 @@ class JakesCode {
     var bars;
     var plot_bars = { x: [], y: [], name: "bars" };
 
-    var SMA12 = 0;
+    //var SMA12 = 0;
     var EMA12 = 0;
     var EMA12p = 0;
     var plot_EMA12 = { x: [], y: [], name: "EMA12" };
 
-    var SMA26 = 0;
+    //var SMA26 = 0;
     var EMA26 = 0;
     var EMA26p = 0;
     var plot_EMA26 = { x: [], y: [], name: "EMA26" };
 
-    var MACDsignalSMA = 0;
+    //var MACDsignalSMA = 0;
     var MACDvalue = 0;
     var plot_MACD = { x: [], y: [], name: "MACD", yaxis: "y2" };
     var MACDsignal = 0;
@@ -277,7 +277,7 @@ class JakesCode {
     var loopCounter = 0;
     await this.alpaca
       .getBars("minute", this.stock, {
-        limit: 50,
+        limit: 250,
       })
       .then((resp) => {
         bars = resp[this.stock];
@@ -287,72 +287,48 @@ class JakesCode {
       });
     var currPrice = bars[bars.length - 1].c;
 
+    EMA12 = EMA12p = EMA26 = EMA26p = bars[0].c;
+
     bars.forEach((bar) => {
       // Calculate EMA12
-      if (loopCounter > 12) {
-        EMA12 = (bar.c - EMA12p) * (2 / (12 + 1)) + EMA12p;
-        EMA12p = EMA12;
-        plot_EMA12.x.push(loopCounter);
-        plot_EMA12.y.push(EMA12);
-      } else {
-        SMA12 += bar.c;
-        if (loopCounter == 12 - 1) {
-          SMA12 /= 12;
-          EMA12p = SMA12;
-        }
-      }
+
+      EMA12 = (bar.c - EMA12p) * (2 / (12 + 1)) + EMA12p;
+      EMA12p = EMA12;
+      plot_EMA12.x.push(loopCounter);
+      plot_EMA12.y.push(EMA12);
 
       // Calculate EMA26
-      if (loopCounter > 26) {
-        EMA26 = (bar.c - EMA26p) * (2 / (26 + 1)) + EMA26p;
-        EMA26p = EMA26;
-        plot_EMA26.x.push(loopCounter);
-        plot_EMA26.y.push(EMA26);
-      } else {
-        SMA26 += bar.c;
-        if (loopCounter == 26 - 1) {
-          SMA26 /= 26;
-          EMA26p = SMA26;
-        }
-      }
+      EMA26 = (bar.c - EMA26p) * (2 / (26 + 1)) + EMA26p;
+      EMA26p = EMA26;
+      plot_EMA26.x.push(loopCounter);
+      plot_EMA26.y.push(EMA26);
 
       // Calculate MACD value and signal
-      if (loopCounter > 35) {
-        MACDvalue = EMA12 - EMA26;
-        plot_MACD.x.push(loopCounter);
-        plot_MACD.y.push(MACDvalue);
-        MACDsignal =
-          (MACDvalue - MACDsignalp) * (2 / (9 + 1)) +
-          MACDsignalp;
-        MACDsignalp = MACDsignal;
-        plot_MACDsignal.x.push(loopCounter);
-        plot_MACDsignal.y.push(MACDsignal);
-        MACDgop = MACDgo;
-        MACDgo = MACDvalue - MACDsignal;
-        plot_MACDgo.x.push(loopCounter);
-        plot_MACDgo.y.push(MACDgo);
+      MACDvalue = EMA12 - EMA26;
+      plot_MACD.x.push(loopCounter);
+      plot_MACD.y.push(MACDvalue);
+      MACDsignal = (MACDvalue - MACDsignalp) * (2 / (9 + 1)) + MACDsignalp;
+      MACDsignalp = MACDsignal;
+      plot_MACDsignal.x.push(loopCounter);
+      plot_MACDsignal.y.push(MACDsignal);
+      MACDgop = MACDgo;
+      MACDgo = MACDvalue - MACDsignal;
+      plot_MACDgo.x.push(loopCounter);
+      plot_MACDgo.y.push(MACDgo);
 
-        if (MACDgo < 0) {
-          MACDgoColor = "rgba(220,0,0,0.75)";
-        } else {
-          MACDgoColor = "rgba(0,220,0,0.75)";
-        }
-        plot_MACDgoColor.push(MACDgoColor);
+      if (MACDgo < 0) {
+        MACDgoColor = "rgba(220,0,0,0.75)";
       } else {
-        MACDsignalSMA += (EMA12 - EMA26);
-        if (loopCounter == 35 - 1) {
-          MACDsignalSMA /= 9;
-          MACDsignalp = MACDsignalSMA;
-        }
+        MACDgoColor = "rgba(0,220,0,0.75)";
       }
+      plot_MACDgoColor.push(MACDgoColor);
 
       plot_bars.x.push(loopCounter);
       plot_bars.y.push(bar.c);
-      writeToEventLog(bar.c+ " | " +EMA12+ " | " +EMA12p+ " | " +EMA26+ " | " +EMA26p+ " | " +MACDvalue+ " | " +MACDvalue+ " | " +MACDsignal+ " | " +MACDsignalp+ " | " +MACDgo+ " | " +MACDgop);
-      
+
       loopCounter += 1;
     });
-    
+
     //var myIDstring = JSON.stringify(plot_MACDgo, null, 1);
     //document.querySelector(".log-info").innerHTML = myIDstring;
     createChart(
@@ -373,22 +349,49 @@ class JakesCode {
       .getPosition(this.stock)
       .then((resp) => {
         positionQuantity = resp.qty;
-        writeToEventLog("Current Position: " + this.stock + " | " + positionQuantity);
+        if (positionQuantity == undefined) {
+          positionQuantity = 0;
+        }
+        /* writeToEventLog(
+          "Current Position: " + this.stock + " | " + positionQuantity
+        ); */
       })
       .catch((err) => {
         console.log(err.error);
       });
 
     var buyingPower;
+    var portfolioValue;
+    var today_tradeCount;
     await this.alpaca
       .getAccount()
       .then((resp) => {
         buyingPower = resp.buying_power;
-        writeToEventLog("Buying Power: "+ buyingPower);
+        portfolioValue = resp.portfolio_value;
+        today_tradeCount = resp.daytrade_count;
+        //writeToEventLog("Buying Power: " + buyingPower);
       })
       .catch((err) => {
         console.log(err.error);
       });
+
+    var minuteUpdate;
+    minuteUpdate = "Updated: " + Date() +
+    "<br>Stock: " +
+      this.stock +
+      "<br>Current Price: $" +
+      currPrice +
+      "<br>Position: " +
+      positionQuantity +
+      "<br>Portfolio Value: $" +
+      portfolioValue +
+      "<br>Buying Power: $" +
+      buyingPower +
+      "<br>Daytrade Count: " +
+      today_tradeCount;
+
+    //writeToEventLog(minuteUpdate);
+    document.querySelector(".log-info").innerHTML = minuteUpdate;
 
     if (this.MACDgo > 0 && this.MACDgop < 0) {
       // negative to positive - buy condition

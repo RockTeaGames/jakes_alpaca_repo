@@ -393,7 +393,7 @@ class JakesCode {
     //writeToEventLog(minuteUpdate);
     document.querySelector(".log-info").innerHTML = minuteUpdate;
 
-    if (this.MACDgo > 0 && this.MACDgop < 0) {
+    if (MACDgo > 0 && MACDgop < 0) {
       // negative to positive - buy condition
       var qtyToBuy = Math.floor(buyingPower / currPrice);
       writeToEventLog(
@@ -405,7 +405,7 @@ class JakesCode {
           currPrice
       );
       await this.submitLimitOrder(qtyToBuy, this.stock, currPrice, "buy");
-    } else if (this.MACDgo < 0 && this.MACDgop > 0) {
+    } else if (MACDgo < 0 && MACDgop > 0) {
       // positive to negative - sell condition
       writeToEventLog(
         "Negative | Closing all " +

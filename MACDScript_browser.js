@@ -63,7 +63,8 @@ class JakesCode {
             this.timeToOpen = Math.floor((openTime - currTime) / 1000 / 60);
             this.hoursToOpen = Math.floor(this.timeToOpen / 60);
             this.minsToOpen = this.timeToOpen - this.hoursToOpen * 60;
-            writeToCurrStatus(null,
+            writeToCurrStatus(
+              null,
               this.hoursToOpen +
                 " hours, " +
                 this.minsToOpen +
@@ -80,7 +81,7 @@ class JakesCode {
     writeToEventLog("Waiting for market to open...");
     await awaitMarketOpen;
     writeToEventLog("Market opened!");
-    writeToCurrStatus(null,"");
+    writeToCurrStatus(null, "");
 
     // Rebalance our portfolio every minute based off MACD
     var spin = setInterval(async () => {
@@ -130,7 +131,7 @@ class JakesCode {
           /*console.log(err.error);*/
         }
         clearInterval(spin);
-        writeToCurrStatus(null,"Sleeping until close (15 minutes).");
+        writeToCurrStatus(null, "Sleeping until close (15 minutes).");
         setTimeout(() => {
           // Run script again after market close for next trading day.
           this.run();
@@ -143,7 +144,6 @@ class JakesCode {
   }
 
   async stopIt() {
-    
     clearInterval(this.spin);
     clearInterval(this.barChecker);
 
@@ -376,10 +376,12 @@ class JakesCode {
       .catch((err) => {
         console.log(err.error);
       });
-
+    // Minute Updates to right side
     var minuteUpdate;
-    minuteUpdate = "Updated: " + Date() +
-    "<br>Stock: " +
+    minuteUpdate =
+      "Updated: " +
+      Date() +
+      "<br>Stock: " +
       this.stock +
       "<br>Current Price: $" +
       currPrice +
@@ -391,9 +393,22 @@ class JakesCode {
       buyingPower +
       "<br>Daytrade Count: " +
       today_tradeCount;
-
-    //writeToEventLog(minuteUpdate);
     document.querySelector(".log-info").innerHTML = minuteUpdate;
+
+    // Minute updates to title of tab
+    var titleUpdate;
+    titleUpdate =
+      "$" +
+      portfolioValue +
+      "|" +
+      positionQuantity +
+      "|" +
+      this.stock +
+      "|$" +
+      currPrice +
+      "|$" +
+      buyingPower;
+    document.title = titleUpdate;
 
     if (MACDgo > 0 && MACDgop < 0) {
       // negative to positive - buy condition

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Jake's Alpaca | Paper</title>
     <link rel="stylesheet" type="text/css" href="JakesAlpaca_browser.css" />
-    
+
     <script src="./Jakes_Manual_API_browser.js"></script>
     <script src="./MACDScript_browser.js"></script>
     <script src="./lib/cors-api.js"></script>
@@ -23,17 +23,26 @@
       <button type="button" class="btn stop" onclick="run_stop();">
         Stop Script
       </button>
-      <button type="button" class="btn manual-rebal" onclick="manual_rebalance();">
+      <button
+        type="button"
+        class="btn manual-rebal"
+        onclick="manual_rebalance();"
+      >
         Manual Rebalance
       </button>
       <button type="button" class="btn getAccount" onclick="run_myAccount();">
         Get Account Info
       </button>
-
-      <pre class="log-output"></pre>
-      <pre class="log-info"></pre>
+      <div class="left-output">
+        <div class="outputs left-top">
+          <p class="status status-top">Script Stopped</p>
+          <p class="status status-bot"></p>
+        </div>
+        <pre class="outputs log-output left-bottom"></pre>
+      </div>
+      <pre class="outputs log-info"></pre>
       <div id="chart"></div>
-        
+
       <!-- <div class="div-input">
         Ticker:
         <input class="input" id="ticker" type="text" placeholder="AAPL" />
@@ -47,7 +56,6 @@
       <button type="button" class="btn cancel" onclick="run_cancelAll();">
         Cancel All
       </button> -->
-      
     </div>
   </body>
 </html>

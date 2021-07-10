@@ -14,8 +14,9 @@ function set_default_stock(){
 }
 
 function run_run() {
+  theKill = false;
   //writeToEventLog("Starting Script");
-  var theStock = document.getElementById("ticker").value;
+    var theStock = document.getElementById("ticker").value;
   if (theStock == "") {
     theStock = theStock_default;
   }
@@ -24,6 +25,8 @@ function run_run() {
 }
 
 function run_stop() {
+  theKill = true;
+  writeToCurrStatus("Script Stopped","");
   writeToEventLog("Stopping Script");
   var theStock = document.getElementById("ticker").value;
   if (theStock == "") {
@@ -80,6 +83,17 @@ function writeToEventLog(text) {
   var addBreak = document.createElement("br");
   someDiv.append(`${text}`, addBreak);
   someDiv.scrollTop = someDiv.scrollHeight;
+}
+
+function writeToCurrStatus(textTop, textBot) {
+  //console.log(textTop,textBot)
+  if (textTop != undefined || textTop != null){
+    document.querySelector(".status-top").innerHTML = textTop;
+  }
+  if (textBot != undefined || textBot != null){
+    document.querySelector(".status-bot").innerHTML = textBot;
+  }
+  
 }
 
 function createChart(chartData, refreshTime) {

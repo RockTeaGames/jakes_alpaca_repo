@@ -18,7 +18,8 @@ class JakesCode {
 
   async run() {
     // First, cancel any existing orders so they don't impact our buying power.
-    writeToEventLog("Starting Script using " + this.stock);
+    //writeToEventLog("Starting Script using " + this.stock);
+    writeToCurrStatus("Script Running with " + this.stock, null);
     var orders;
     await this.alpaca
       .getOrders({ status: "open", direction: "asc" })
@@ -62,11 +63,11 @@ class JakesCode {
             this.timeToOpen = Math.floor((openTime - currTime) / 1000 / 60);
             this.hoursToOpen = Math.floor(this.timeToOpen / 60);
             this.minsToOpen = this.timeToOpen - this.hoursToOpen * 60;
-            writeToEventLog(
+            writeToCurrStatus(null,
               this.hoursToOpen +
                 " hours, " +
                 this.minsToOpen +
-                " minutes until next market open."
+                " minutes until next open"
             );
             //writeToEventLog(`${this.timeToOpen} minutes til next market open.`);
           }
@@ -79,6 +80,7 @@ class JakesCode {
     writeToEventLog("Waiting for market to open...");
     await awaitMarketOpen;
     writeToEventLog("Market opened!");
+    writeToCurrStatus(null,"");
 
     // Rebalance our portfolio every minute based off MACD
     var spin = setInterval(async () => {
@@ -128,7 +130,7 @@ class JakesCode {
           /*console.log(err.error);*/
         }
         clearInterval(spin);
-        writeToEventLog("Sleeping until market close (15 minutes).");
+        writeToCurrStatus(null,"Sleeping until close (15 minutes).");
         setTimeout(() => {
           // Run script again after market close for next trading day.
           this.run();
@@ -141,7 +143,7 @@ class JakesCode {
   }
 
   async stopIt() {
-    theKill = true;
+    
     clearInterval(this.spin);
     clearInterval(this.barChecker);
 
@@ -381,7 +383,7 @@ class JakesCode {
       this.stock +
       "<br>Current Price: $" +
       currPrice +
-      "<br>Position: " +
+      "<br>Current Position: " +
       positionQuantity +
       "<br>Portfolio Value: $" +
       portfolioValue +

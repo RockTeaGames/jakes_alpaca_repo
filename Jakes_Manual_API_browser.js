@@ -1,10 +1,18 @@
 class theTest {
   constructor(API_KEY, API_SECRET, PAPER, theStock) {
+    var theBaseURL;
+    if (PAPER == true) {
+      theBaseURL = "https://paper-api.alpaca.markets";
+    } else {
+      theBaseURL = "https://api.alpaca.markets";
+    }
+
     this.alpaca = new AlpacaCORS({
       keyId: API_KEY,
       secretKey: API_SECRET,
-      baseUrl: "https://paper-api.alpaca.markets",
+      baseUrl: theBaseURL,
     });
+    
     this.stock = theStock;
   }
 

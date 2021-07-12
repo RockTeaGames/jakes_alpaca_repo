@@ -1,10 +1,17 @@
 class JakesCode {
   constructor(API_KEY, API_SECRET, PAPER, theStock) {
+    var theBaseURL;
+    if (PAPER == true) {
+      theBaseURL = "https://paper-api.alpaca.markets";
+    } else {
+      theBaseURL = "https://api.alpaca.markets";
+    }
+
     this.alpaca = new AlpacaCORS({
       keyId: API_KEY,
       secretKey: API_SECRET,
       paper: PAPER,
-      baseUrl: "https://paper-api.alpaca.markets",
+      baseUrl: theBaseURL,
     });
 
     this.lastOrder = null;
@@ -19,7 +26,12 @@ class JakesCode {
   async run() {
     // First, cancel any existing orders so they don't impact our buying power.
     //writeToEventLog("Starting Script using " + this.stock);
-    writeToCurrStatus("Script Running with " + this.stock, null);
+    if (PAPER == true){
+      writeToCurrStatus("Paper | Script Running with " + this.stock, null);
+    } else {
+      writeToCurrStatus("Live | Script Running with " + this.stock, null);
+    }
+    
     var orders;
     await this.alpaca
       .getOrders({ status: "open", direction: "asc" })

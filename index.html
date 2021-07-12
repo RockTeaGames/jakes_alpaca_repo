@@ -1,49 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jake's Alpaca | Paper</title>
-    <link rel="stylesheet" type="text/css" href="JakesAlpaca_browser.css" />
 
-    <script src="./Jakes_Manual_API_browser.js"></script>
-    <script src="./MACDScript_browser.js"></script>
-    <script src="./lib/cors-api.js"></script>
-    <script src="./JakesAlpaca_forBrowser.js"></script>
-    <script src="https://cdn.plot.ly/plotly-2.2.0.min.js"></script>
-  </head>
-  <body onload="set_default_stock()">
-    <div class="grid-container">
-      <p class="theTitle">Jake's Alpaca | Paper Trades</p>
-      <input class="input" id="ticker" type="text" />
-      <button type="button" class="btn start" onclick="run_run();">
-        Run Script
-      </button>
-      <button type="button" class="btn stop" onclick="run_stop();">
-        Stop Script
-      </button>
-      <button
-        type="button"
-        class="btn manual-rebal"
-        onclick="manual_rebalance();"
-      >
-        Manual Rebalance
-      </button>
-      <button type="button" class="btn getAccount" onclick="run_myAccount();">
-        Get Account Info
-      </button>
-      <div class="left-output">
-        <div class="outputs left-top">
-          <p class="status status-top">Script Stopped</p>
-          <p class="status status-bot"></p>
-        </div>
-        <pre class="outputs log-output left-bottom"></pre>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jake's Alpaca | Paper</title>
+  <link rel="stylesheet" type="text/css" href="JakesAlpaca_browser.css" />
+
+  <script src="./Jakes_Manual_API_browser.js"></script>
+  <script src="./MACDScript_browser.js"></script>
+  <script src="./lib/cors-api.js"></script>
+  <script src="./JakesAlpaca_forBrowser.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.2.0.min.js"></script>
+</head>
+
+<body onload="website_load()">
+  <nav class="nav">
+    <button class="nav__toggle">
+      <span class="hamburger"></span>
+    </button>
+    <ul class="nav__list">
+      <li class="nav__item">
+        <label class="switch" onclick="save_keys()">
+          <input type="checkbox" id="paper_checkbox" />
+          <span class="slider round">PAPER</span>
+        </label>
+      </li>
+      <li class="nav__item">Trading Stock</li>
+      <li class="nav__item">
+        <input type="text" class="stock-width nav-input-stock" id="ticker" placeholder="STOCK" />
+      </li>
+      <li class="nav__item">Paper API Key/Secret</li>
+      <li class="nav__item">
+        <input type="text" class="key-width nav-paper-key" placeholder="API_KEY_PAPER" />
+      </li>
+      <li class="nav__item">
+        <input type="text" class="key-width nav-paper-secret" placeholder="API_SECRET_PAPER" />
+      </li>
+      <li class="nav__item">Real API Key/Secret</li>
+      <li class="nav__item">
+        <input type="text" class="key-width nav-real-key" placeholder="API_KEY" />
+      </li>
+      <li class="nav__item">
+        <input type="text" class="key-width nav-real-secret" placeholder="API_SECRET" />
+      </li>
+      <li><button class="btn" onclick="save_keys()">Save</button></li>
+    </ul>
+  </nav>
+
+  <div class="grid-container">
+    <p class="theTitle">Jake's Alpaca | Paper Trades</p>
+
+    <button type="button" class="btn start" onclick="run_run();">
+      Run Script
+    </button>
+    <button type="button" class="btn stop" onclick="run_stop();">
+      Stop Script
+    </button>
+    <button type="button" class="btn manual-rebal" onclick="manual_rebalance();">
+      Manual Rebalance
+    </button>
+    <button type="button" class="btn getAccount" onclick="run_myAccount();">
+      Get Account Info
+    </button>
+    <div class="left-output">
+      <div class="outputs left-top">
+        <p class="status status-top">Script Stopped</p>
+        <p class="status status-bot"></p>
       </div>
-      <pre class="outputs log-info"></pre>
-      <div id="chart"></div>
+      <pre class="outputs log-output left-bottom"></pre>
+    </div>
+    <pre class="outputs log-info"></pre>
+    <div id="chart"></div>
 
-      <!-- <div class="div-input">
+    <!-- <div class="div-input">
         Ticker:
         <input class="input" id="ticker" type="text" placeholder="AAPL" />
         <br />
@@ -56,6 +87,7 @@
       <button type="button" class="btn cancel" onclick="run_cancelAll();">
         Cancel All
       </button> -->
-    </div>
-  </body>
+  </div>
+</body>
+
 </html>

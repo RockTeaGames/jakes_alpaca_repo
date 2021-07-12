@@ -1,52 +1,100 @@
-const API_KEY = "PKDSBV3IAVADYZVKMIOT";
-const API_SECRET = "Fm6mMt7Ghh3QK2HBm4xtASacoqdABpWoboJOsdK2";
+var PAPER;
+var theStock;
+var API_KEY_paper;
+var API_SECRET_paper;
+var API_KEY;
+var API_SECRET;
 const MINUTE = 60000;
-const PAPER = true;
 var theKill = false;
-
-var theStock_default = "GPRO";
-//var theqty_default = 10;
 
 const testissue = true;
 
-function set_default_stock(){
-  document.getElementById("ticker").placeholder = theStock_default;
+function website_load() {
+  PAPER = localStorage.getItem("PAPER");
+  theStock = localStorage.getItem("STOCK");
+
+  API_KEY_paper = localStorage.getItem("API_KEY_paper");
+  API_SECRET_paper = localStorage.getItem("API_SECRET_paper");
+  API_KEY_real = localStorage.getItem("API_KEY_real");
+  API_SECRET_real = localStorage.getItem("API_SECRET_real");
+
+  document.querySelector(".nav-input-stock").value = theStock;
+  document.querySelector(".nav-paper-key").value = API_KEY_paper;
+  document.querySelector(".nav-paper-secret").value = API_SECRET_paper;
+  document.querySelector(".nav-real-key").value = API_KEY_real;
+  document.querySelector(".nav-real-secret").value = API_SECRET_real;
+
+  if (PAPER == "true") {
+    PAPER = true;
+    API_KEY = API_KEY_paper;
+    API_SECRET = API_SECRET_paper;
+    document.getElementById("paper_checkbox").checked = true;
+  } else {
+    PAPER = false;
+    API_KEY = API_KEY_real;
+    API_SECRET = API_SECRET_real;
+    document.getElementById("paper_checkbox").checked = false;
+  }
+
+  const navToggle = document.querySelector(".nav__toggle");
+  navToggle.addEventListener("click", () => {
+    document.body.classList.toggle("nav-open");
+  });
+
+  //console.log(PAPER,API_KEY,API_SECRET);
+}
+
+function save_keys() {
+  const PAPER = document.getElementById("paper_checkbox");
+  const theStock = document.querySelector(".nav-input-stock").value;
+
+  const theKeyPaper = document.querySelector(".nav-paper-key").value;
+  const theSecretPaper = document.querySelector(".nav-paper-secret").value;
+  const theKeyReal = document.querySelector(".nav-real-key").value;
+  const theSecretReal = document.querySelector(".nav-real-secret").value;
+
+  localStorage.setItem("PAPER", PAPER.checked);
+  localStorage.setItem("STOCK", theStock);
+  localStorage.setItem("API_KEY_paper", theKeyPaper);
+  localStorage.setItem("API_SECRET_paper", theSecretPaper);
+  localStorage.setItem("API_KEY_real", theKeyReal);
+  localStorage.setItem("API_SECRET_real", theSecretReal);
+
+  website_load();
 }
 
 function run_run() {
   theKill = false;
   //writeToEventLog("Starting Script");
-    var theStock = document.getElementById("ticker").value;
-  if (theStock == "") {
-    theStock = theStock_default;
-  }
+  //theStock = document.getElementById("ticker").value;
   var runIt = new JakesCode(API_KEY, API_SECRET, PAPER, theStock);
   runIt.run();
 }
 
 function run_stop() {
   theKill = true;
-  writeToCurrStatus("Script Stopped","");
+  writeToCurrStatus("Script Stopped", "");
   writeToEventLog("Stopping Script");
-  var theStock = document.getElementById("ticker").value;
-  if (theStock == "") {
-    theStock = theStock_default;
-  }
+  //theStock = document.getElementById("ticker").value;
   var runIt = new JakesCode(API_KEY, API_SECRET, PAPER, theStock);
   runIt.stopIt();
   //send_logEmail();
 }
 
-function send_logEmail(){
+function send_logEmail() {
   var email_to = "rochteja@outlook.com";
   var email_Subject = "Alpaca String Log | " + Date();
-  var email_Body = document.querySelector('.log-output').innerHTML.replace(/<br>/g,' %0D ');
+  var email_Body = document
+    .querySelector(".log-output")
+    .innerHTML.replace(/<br>/g, " %0D ");
   //console.log(email_Body.length)
-  window.open('mailto:'+ email_to +'?subject=' + email_Subject + '&body=' + email_Body)
+  window.open(
+    "mailto:" + email_to + "?subject=" + email_Subject + "&body=" + email_Body
+  );
 }
 
 function run_myAccount() {
-  var runIt = new theTest(API_KEY, API_SECRET);
+  var runIt = new theTest(API_KEY, API_SECRET,PAPER,theStock);
   runIt.myaccount();
   //createChart();
 }
@@ -87,13 +135,12 @@ function writeToEventLog(text) {
 
 function writeToCurrStatus(textTop, textBot) {
   //console.log(textTop,textBot)
-  if (textTop != undefined || textTop != null){
+  if (textTop != undefined || textTop != null) {
     document.querySelector(".status-top").innerHTML = textTop;
   }
-  if (textBot != undefined || textBot != null){
+  if (textBot != undefined || textBot != null) {
     document.querySelector(".status-bot").innerHTML = textBot;
   }
-  
 }
 
 function createChart(chartData, refreshTime) {
@@ -118,10 +165,7 @@ function createChart(chartData, refreshTime) {
 
 function manual_rebalance() {
   writeToEventLog("Manual Rebalance Started");
-  var theStock = document.getElementById("ticker").value;
-  if (theStock == "") {
-    theStock = theStock_default;
-  }
+  //theStock = document.getElementById("ticker").value;
   var runIt = new JakesCode(API_KEY, API_SECRET, PAPER, theStock);
   runIt.rebalance();
   //writeToEventLog("Manual Rebalance Finished");

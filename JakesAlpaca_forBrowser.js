@@ -29,11 +29,13 @@ function website_load() {
     API_KEY = API_KEY_paper;
     API_SECRET = API_SECRET_paper;
     document.getElementById("paper_checkbox").checked = true;
+    document.querySelector(".theTitle").innerHTML = "Jake's Alpaca | PAPER Trading"
   } else {
     PAPER = false;
     API_KEY = API_KEY_real;
     API_SECRET = API_SECRET_real;
     document.getElementById("paper_checkbox").checked = false;
+    document.querySelector(".theTitle").innerHTML = "Jake's Alpaca | LIVE Trading"
   }
 
   const navToggle = document.querySelector(".nav__toggle");

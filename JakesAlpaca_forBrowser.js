@@ -64,9 +64,14 @@ function save_keys() {
 
   website_load();
 }
+function theLocalDateTime (){
+  const theDateTime = (new Date()).toLocaleDateString('en-US') + " @ " + (new Date()).toLocaleTimeString('en-US');
+  return(theDateTime);
+}
 
 function run_run() {
   theKill = false;
+  writeToEventLog("Script Started: " + theLocalDateTime());
   //writeToEventLog("Starting Script");
   //theStock = document.getElementById("ticker").value;
   var runIt = new JakesCode(API_KEY, API_SECRET, PAPER, theStock);

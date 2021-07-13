@@ -19,6 +19,7 @@ class JakesCode {
     this.hoursToOpen = null;
     this.minsToOpen = null;
     this.timeToClose = null;
+    this.refreshCount = 0;
     // Stock that the algo will trade.
     this.stock = theStock;
   }
@@ -26,12 +27,12 @@ class JakesCode {
   async run() {
     // First, cancel any existing orders so they don't impact our buying power.
     //writeToEventLog("Starting Script using " + this.stock);
-    if (PAPER == true){
+    if (PAPER == true) {
       writeToCurrStatus("Paper | Script Running with " + this.stock, null);
     } else {
       writeToCurrStatus("Live | Script Running with " + this.stock, null);
     }
-    
+
     var orders;
     await this.alpaca
       .getOrders({ status: "open", direction: "asc" })
@@ -150,6 +151,7 @@ class JakesCode {
         }, MINUTE * 15);
       } else {
         // Rebalance the portfolio.
+        this.refreshCount += 1;
         await this.rebalance();
       }
     }, MINUTE);
@@ -354,7 +356,7 @@ class JakesCode {
         plot_MACDsignal,
         plot_MACDgo,
       ],
-      Date()
+      theLocalDateTime()
     );
 
     // Get our position, if any.
@@ -388,11 +390,13 @@ class JakesCode {
       .catch((err) => {
         console.log(err.error);
       });
+
+    writeToCurrStatus(null, "Script Refresh Count: " + this.refreshCount);
     // Minute Updates to right side
     var minuteUpdate;
     minuteUpdate =
       "Updated: " +
-      Date() +
+      theLocalDateTime() +
       "<br>Stock: " +
       this.stock +
       "<br>Current Price: $" +

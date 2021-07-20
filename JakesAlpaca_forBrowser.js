@@ -150,8 +150,12 @@ function writeToCurrStatus(textTop, textBot) {
   }
 }
 
-function createChart(chartData, refreshTime) {
-  chartObj = document.getElementById("chart");
+
+function theChart(chartData, refreshTime) {
+
+
+
+  //chartObj = document.getElementById("chart");
 
   var chartlayout = {
     title: "Refreshed: " + refreshTime,
@@ -167,7 +171,7 @@ function createChart(chartData, refreshTime) {
     },
   };
 
-  Plotly.newPlot(chartObj, chartData, chartlayout);
+  //Plotly.newPlot(chartObj, chartData, chartlayout);
 }
 
 function manual_rebalance() {

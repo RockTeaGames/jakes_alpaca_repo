@@ -24,6 +24,8 @@ class JakesCode {
     this.stock = theStock;
   }
 
+
+
   async run() {
     // First, cancel any existing orders so they don't impact our buying power.
     //writeToEventLog("Starting Script using " + this.stock);

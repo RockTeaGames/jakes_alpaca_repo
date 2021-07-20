@@ -308,14 +308,14 @@ class JakesCode {
     bars.forEach((bar) => {
       // Calculate EMA12
 
-      EMA12 = (bar.c - EMA12p) * (2 / (12 + 1)) + EMA12p;
       EMA12p = EMA12;
+      EMA12 = (bar.c - EMA12p) * (2 / (12 + 1)) + EMA12p;
       plot_EMA12.x.push(loopCounter);
       plot_EMA12.y.push(EMA12);
 
       // Calculate EMA26
-      EMA26 = (bar.c - EMA26p) * (2 / (26 + 1)) + EMA26p;
       EMA26p = EMA26;
+      EMA26 = (bar.c - EMA26p) * (2 / (26 + 1)) + EMA26p;
       plot_EMA26.x.push(loopCounter);
       plot_EMA26.y.push(EMA26);
 
@@ -323,8 +323,8 @@ class JakesCode {
       MACDvalue = EMA12 - EMA26;
       plot_MACD.x.push(loopCounter);
       plot_MACD.y.push(MACDvalue);
-      MACDsignal = (MACDvalue - MACDsignalp) * (2 / (9 + 1)) + MACDsignalp;
       MACDsignalp = MACDsignal;
+      MACDsignal = (MACDvalue - MACDsignalp) * (2 / (9 + 1)) + MACDsignalp;
       plot_MACDsignal.x.push(loopCounter);
       plot_MACDsignal.y.push(MACDsignal);
       MACDgop = MACDgo;

@@ -65,6 +65,14 @@ body {
   grid-row: 3/4;
   grid-column: 2/4;
 }
+#topChart {
+  height: 18em;
+  
+}
+#botChart {
+  height: 10em;
+  
+}
 
 .btn {
   padding: 0.5em;

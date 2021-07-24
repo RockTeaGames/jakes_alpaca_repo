@@ -258,45 +258,39 @@ class JakesCode {
 
   async rebalance() {
     var bars;
-    var plot_bars = { x: [], y: [], name: "bars" };
+    var theTime = 0;
+    var plot_bars = [];
 
     //var SMA12 = 0;
     var EMA12 = 0;
     var EMA12p = 0;
-    var plot_EMA12 = { x: [], y: [], name: "EMA12" };
+    var plot_EMA12 = [];
 
     //var SMA26 = 0;
     var EMA26 = 0;
     var EMA26p = 0;
-    var plot_EMA26 = { x: [], y: [], name: "EMA26" };
+    var plot_EMA26 = [];
 
     //var MACDsignalSMA = 0;
     var MACDvalue = 0;
-    var plot_MACD = { x: [], y: [], name: "MACD", yaxis: "y2" };
+    var plot_MACD = [];
     var MACDsignal = 0;
     var MACDsignalp = 0;
-    var plot_MACDsignal = { x: [], y: [], name: "MACD Signal", yaxis: "y2" };
+    var plot_MACDsignal = [];
 
     var MACDgo = 0;
     var MACDgop = 0;
     var MACDgoColor = "rgba(0,0,0,0)";
-    var plot_MACDgoColor = [];
-    var plot_MACDgo = {
-      x: [],
-      y: [],
-      name: "Buy-Sell",
-      yaxis: "y3",
-      type: "bar",
-      marker: { color: plot_MACDgoColor },
-    };
+    var plot_MACDgo = [];
 
     var loopCounter = 0;
     await this.alpaca
       .getBars("minute", this.stock, {
-        limit: 250,
+        limit: 200,
       })
       .then((resp) => {
         bars = resp[this.stock];
+        //console.log(resp);
       })
       .catch((err) => {
         writeToEventLog("getBars error: " + err.error);
@@ -307,56 +301,47 @@ class JakesCode {
 
     bars.forEach((bar) => {
       // Calculate EMA12
+      theTime = bar.t;
 
       EMA12p = EMA12;
       EMA12 = (bar.c - EMA12p) * (2 / (12 + 1)) + EMA12p;
-      plot_EMA12.x.push(loopCounter);
-      plot_EMA12.y.push(EMA12);
+      plot_EMA12.push({ time: theTime, value: EMA12 });
 
       // Calculate EMA26
       EMA26p = EMA26;
       EMA26 = (bar.c - EMA26p) * (2 / (26 + 1)) + EMA26p;
-      plot_EMA26.x.push(loopCounter);
-      plot_EMA26.y.push(EMA26);
+      plot_EMA26.push({ time: theTime, value: EMA26 });
 
       // Calculate MACD value and signal
       MACDvalue = EMA12 - EMA26;
-      plot_MACD.x.push(loopCounter);
-      plot_MACD.y.push(MACDvalue);
+      plot_MACD.push({ time: theTime, value: MACDvalue });
       MACDsignalp = MACDsignal;
       MACDsignal = (MACDvalue - MACDsignalp) * (2 / (9 + 1)) + MACDsignalp;
-      plot_MACDsignal.x.push(loopCounter);
-      plot_MACDsignal.y.push(MACDsignal);
+      plot_MACDsignal.push({ time: theTime, value: MACDsignal });
       MACDgop = MACDgo;
       MACDgo = MACDvalue - MACDsignal;
-      plot_MACDgo.x.push(loopCounter);
-      plot_MACDgo.y.push(MACDgo);
 
       if (MACDgo < 0) {
-        MACDgoColor = "rgba(220,0,0,0.75)";
+        MACDgoColor = "rgba(150,0,0,1)";
       } else {
-        MACDgoColor = "rgba(0,220,0,0.75)";
+        MACDgoColor = "rgba(0,150,0,1)";
       }
-      plot_MACDgoColor.push(MACDgoColor);
 
-      plot_bars.x.push(loopCounter);
-      plot_bars.y.push(bar.c);
+      plot_MACDgo.push({ time: theTime, value: MACDgo, color: MACDgoColor });
+      plot_bars.push({ time: theTime, value: bar.c });
 
       loopCounter += 1;
     });
 
     //var myIDstring = JSON.stringify(plot_MACDgo, null, 1);
     //document.querySelector(".log-info").innerHTML = myIDstring;
-    createChart(
-      [
-        plot_bars,
-        plot_EMA12,
-        plot_EMA26,
-        plot_MACD,
-        plot_MACDsignal,
-        plot_MACDgo,
-      ],
-      theLocalDateTime()
+    createTheChart(
+      plot_bars,
+      plot_EMA12,
+      plot_EMA26,
+      plot_MACD,
+      plot_MACDsignal,
+      plot_MACDgo
     );
 
     // Get our position, if any.

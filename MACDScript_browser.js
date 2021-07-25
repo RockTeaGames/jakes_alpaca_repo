@@ -298,6 +298,7 @@ class JakesCode {
     var currPrice = bars[bars.length - 1].c;
 
     EMA12 = EMA12p = EMA26 = EMA26p = bars[0].c;
+    
 
     bars.forEach((bar) => {
       // Calculate EMA12

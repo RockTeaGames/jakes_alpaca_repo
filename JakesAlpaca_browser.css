@@ -1,7 +1,6 @@
 body {
   background-color: darkgray;
   overflow-x: hidden;
-  
 }
 .grid-container {
   display: grid;
@@ -67,11 +66,9 @@ body {
 }
 #topChart {
   height: 18em;
-  
 }
 #botChart {
   height: 10em;
-  
 }
 
 .btn {
@@ -129,11 +126,11 @@ body {
   padding: 3em 2em;
   text-align: center;
 }
-.key-width{
+.key-width {
   width: 25em;
   text-align: center;
 }
-.stock-width{
+.stock-width {
   width: 6em;
   text-align: center;
 }

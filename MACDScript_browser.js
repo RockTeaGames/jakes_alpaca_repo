@@ -28,9 +28,9 @@ class JakesCode {
     // First, cancel any existing orders so they don't impact our buying power.
     //writeToEventLog("Starting Script using " + this.stock);
     if (PAPER == true) {
-      writeToCurrStatus("Paper | Script Running with " + this.stock, null);
+      writeToCurrStatus("Paper | Running with " + this.stock, null);
     } else {
-      writeToCurrStatus("Live | Script Running with " + this.stock, null);
+      writeToCurrStatus("Live | Running with " + this.stock, null);
     }
 
     var orders;
@@ -298,7 +298,6 @@ class JakesCode {
     var currPrice = bars[bars.length - 1].c;
 
     EMA12 = EMA12p = EMA26 = EMA26p = bars[0].c;
-    
 
     bars.forEach((bar) => {
       // Calculate EMA12
@@ -379,8 +378,7 @@ class JakesCode {
 
     writeToCurrStatus(null, "Script Refresh Count: " + this.refreshCount);
     // Minute Updates to right side
-    var minuteUpdate;
-    minuteUpdate =
+    var minuteUpdate =
       "Updated: " +
       theLocalDateTime() +
       "<br>Stock: " +
@@ -398,8 +396,7 @@ class JakesCode {
     document.querySelector(".log-info").innerHTML = minuteUpdate;
 
     // Minute updates to title of tab
-    var titleUpdate;
-    titleUpdate =
+    var titleUpdate =
       "$" +
       portfolioValue +
       "|" +
@@ -423,7 +420,7 @@ class JakesCode {
           " @ " +
           currPrice
       );
-      await this.submitLimitOrder(qtyToBuy, this.stock, currPrice, "buy");
+      await this.submitMarketOrder(positionQuantity, this.stock, "buy");
     } else if (MACDgo < 0 && MACDgop > 0) {
       // positive to negative - sell condition
       writeToEventLog(

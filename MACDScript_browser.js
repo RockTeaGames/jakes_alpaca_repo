@@ -1,4 +1,4 @@
-class JakesCode {
+class MACDScript {
   constructor(API_KEY, API_SECRET, PAPER, theStock) {
     var theBaseURL;
     if (PAPER == true) {
@@ -151,7 +151,7 @@ class JakesCode {
         }, MINUTE * 15);
       } else {
         // Rebalance the portfolio.
-        this.refreshCount += 1;
+        this.refreshCount++;
         await this.rebalance();
       }
     }, MINUTE);
@@ -283,7 +283,6 @@ class JakesCode {
     var MACDgoColor = "rgba(0,0,0,0)";
     var plot_MACDgo = [];
 
-    var loopCounter = 0;
     await this.alpaca
       .getBars("minute", this.stock, {
         limit: 200,
@@ -330,7 +329,6 @@ class JakesCode {
       plot_MACDgo.push({ time: theTime, value: MACDgo, color: MACDgoColor });
       plot_bars.push({ time: theTime, value: bar.c });
 
-      loopCounter += 1;
     });
 
     //var myIDstring = JSON.stringify(plot_MACDgo, null, 1);
@@ -409,7 +407,7 @@ class JakesCode {
       buyingPower;
     document.title = titleUpdate;
 
-    if (MACDgo > 0 && MACDgop < 0) {
+    if (MACDgop < 0 && MACDgo > 0) {
       // negative to positive - buy condition
       var qtyToBuy = Math.floor(buyingPower / currPrice);
       writeToEventLog(
@@ -420,8 +418,8 @@ class JakesCode {
           " @ " +
           currPrice
       );
-      await this.submitMarketOrder(positionQuantity, this.stock, "buy");
-    } else if (MACDgo < 0 && MACDgop > 0) {
+      await this.submitMarketOrder(qtyToBuy, this.stock, "buy");
+    } else if (MACDgop > 0 && MACDgo < 0) {
       // positive to negative - sell condition
       writeToEventLog(
         "Negative | Closing all " +
@@ -433,8 +431,6 @@ class JakesCode {
       );
       await this.submitMarketOrder(positionQuantity, this.stock, "sell");
       //await this.alpaca.cancelAllPositions();
-    } else {
-      //writeToEventLog("");
     }
   }
 }

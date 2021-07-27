@@ -129,10 +129,12 @@ body {
 .key-width {
   width: 25em;
   text-align: center;
+  
 }
 .stock-width {
   width: 6em;
   text-align: center;
+  
 }
 
 .nav__item {

@@ -1,4 +1,4 @@
-class theTest {
+class ManualAPIFunctions {
   constructor(API_KEY, API_SECRET, PAPER, theStock) {
     var theBaseURL;
     if (PAPER == true) {

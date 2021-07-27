@@ -2,14 +2,17 @@ var PAPER;
 var theStock;
 var API_KEY_paper;
 var API_SECRET_paper;
+var API_KEY_real;
+var API_SECRET_real;
 var API_KEY;
 var API_SECRET;
+
 const MINUTE = 60000;
 var theKill = false;
 
 const testissue = true;
 
-function website_load() {
+function website_load(firstLoad) {
   PAPER = localStorage.getItem("PAPER");
   theStock = localStorage.getItem("STOCK");
 
@@ -40,31 +43,31 @@ function website_load() {
       "Jake's Alpaca | LIVE Trading";
   }
 
-  const navToggle = document.querySelector(".nav__toggle");
-  navToggle.addEventListener("click", () => {
-    document.body.classList.toggle("nav-open");
-  });
-
-  //console.log(PAPER,API_KEY,API_SECRET);
+  if ((firstLoad == true)) {
+    document.querySelector(".nav__toggle").addEventListener("click", () => {
+      document.body.classList.toggle("nav-open");
+      save_keys();
+    });
+  }
 }
 
 function save_keys() {
-  const PAPER = document.getElementById("paper_checkbox");
-  const theStock = document.querySelector(".nav-input-stock").value;
+  PAPER = document.getElementById("paper_checkbox");
+  theStock = document.querySelector(".nav-input-stock").value;
 
-  const theKeyPaper = document.querySelector(".nav-paper-key").value;
-  const theSecretPaper = document.querySelector(".nav-paper-secret").value;
-  const theKeyReal = document.querySelector(".nav-real-key").value;
-  const theSecretReal = document.querySelector(".nav-real-secret").value;
+  API_KEY_paper = document.querySelector(".nav-paper-key").value;
+  API_SECRET_paper = document.querySelector(".nav-paper-secret").value;
+  API_KEY_real = document.querySelector(".nav-real-key").value;
+  API_SECRET_real = document.querySelector(".nav-real-secret").value;
 
   localStorage.setItem("PAPER", PAPER.checked);
   localStorage.setItem("STOCK", theStock);
-  localStorage.setItem("API_KEY_paper", theKeyPaper);
-  localStorage.setItem("API_SECRET_paper", theSecretPaper);
-  localStorage.setItem("API_KEY_real", theKeyReal);
-  localStorage.setItem("API_SECRET_real", theSecretReal);
+  localStorage.setItem("API_KEY_paper", API_KEY_paper);
+  localStorage.setItem("API_SECRET_paper", API_SECRET_paper);
+  localStorage.setItem("API_KEY_real", API_KEY_real);
+  localStorage.setItem("API_SECRET_real", API_SECRET_real);
 
-  website_load();
+  website_load(false);
 }
 
 function theLocalDateTime() {
@@ -80,7 +83,7 @@ function run_run() {
   writeToEventLog("Script Started: " + theLocalDateTime());
   //writeToEventLog("Starting Script");
   //theStock = document.getElementById("ticker").value;
-  var runIt = new JakesCode(API_KEY, API_SECRET, PAPER, theStock);
+  var runIt = new MACDScript(API_KEY, API_SECRET, PAPER, theStock);
   runIt.run();
 }
 
@@ -89,55 +92,17 @@ function run_stop() {
   writeToCurrStatus("Script Stopped", "");
   writeToEventLog("Stopping Script");
   //theStock = document.getElementById("ticker").value;
-  var runIt = new JakesCode(API_KEY, API_SECRET, PAPER, theStock);
+  var runIt = new MACDScript(API_KEY, API_SECRET, PAPER, theStock);
   runIt.stopIt();
   //send_logEmail();
 }
 
-function send_logEmail() {
-  var email_to = "rochteja@outlook.com";
-  var email_Subject = "Alpaca String Log | " + Date();
-  var email_Body = document
-    .querySelector(".log-output")
-    .innerHTML.replace(/<br>/g, " %0D ");
-  //console.log(email_Body.length)
-  window.open(
-    "mailto:" + email_to + "?subject=" + email_Subject + "&body=" + email_Body
-  );
-}
-
 function run_myAccount() {
-  var runIt = new theTest(API_KEY, API_SECRET, PAPER, theStock);
+  var runIt = new ManualAPIFunctions(API_KEY, API_SECRET, PAPER, theStock);
   runIt.myaccount();
   //createChart();
 }
-/*
-function run_submitOrder() {
-  var theticker = document.getElementById("ticker").value;
-  var theqty = document.getElementById("qty").value;
 
-  if (theticker == "") {
-    theticker = theticker_default;
-  }
-  if (theqty == "") {
-    theqty = theqty_default;
-  }
-
-  var runIt = new theTest(API_KEY, API_SECRET,PAPER,theStock);
-  runIt.submitMarketOrder(theqty, theticker, "buy");
-  setTimeout(() => {
-    run_myAccount();
-  }, 500);
-}
-
-function run_cancelAll() {
-  var runIt = new theTest(API_KEY, API_SECRET,PAPER,theStock);
-  runIt.cancelAll();
-  setTimeout(() => {
-    run_myAccount();
-  }, 500);
-}
-*/
 function writeToEventLog(text) {
   //console.log(`${text}`);
   var someDiv = document.querySelector(".log-output");
@@ -156,114 +121,8 @@ function writeToCurrStatus(textTop, textBot) {
   }
 }
 
-function createTheChart(
-  plot_bars,
-  plot_EMA12,
-  plot_EMA26,
-  plot_MACD,
-  plot_MACDsignal,
-  plot_MACDgo
-) {
-  document.getElementById("topChart").innerHTML = "";
-  document.getElementById("botChart").innerHTML = "";
-  //const chartHeight = document.getElementById("topChart").clientHeight ;
-  //console.log(chartHeight);
-  const topchart = LightweightCharts.createChart(
-    document.getElementById("topChart"),
-    {
-      //width: chartWidth,
-      //height: chartHeight,
-      layout: {
-        backgroundColor: "rgba(0, 0, 0, 0)",
-        textColor: "rgba(0, 0, 0, 1)",
-      },
-      grid: {
-        vertLines: {
-          color: "rgba(100, 100, 100, 0.5)",
-          style: LightweightCharts.LineStyle.Dotted,
-        },
-        horzLines: {
-          color: "rgba(100, 100, 100, 0.5)",
-          style: LightweightCharts.LineStyle.Dotted,
-        },
-      },
-    }
-  );
-  //topchart.timeScale().fitContent();
-  topchart.applyOptions({
-    timeScale: {
-      timeVisible: true,
-    },
-  });
-
-  const botchart = LightweightCharts.createChart(
-    document.getElementById("botChart"),
-    {
-      //width: chartWidth,
-      //height: chartHeight,
-      layout: {
-        backgroundColor: "rgba(0, 0, 0, 0)",
-        textColor: "rgba(0, 0, 0, 1)",
-      },
-      grid: {
-        vertLines: {
-          color: "rgba(100, 100, 100, 0.5)",
-          style: LightweightCharts.LineStyle.Dotted,
-        },
-        horzLines: {
-          color: "rgba(100, 100, 100, 0.5)",
-          style: LightweightCharts.LineStyle.Dotted,
-        },
-      },
-    }
-  );
-  //botchart.timeScale().fitContent();
-  botchart.applyOptions({
-    timeScale: {
-      timeVisible: true,
-    },
-  });
-
-  const barsSeries = topchart.addLineSeries({
-    color: "rgba(0,75,30,1)",
-    //title: theStock,
-  });
-  barsSeries.setData(plot_bars);
-
-  const EMA12Series = topchart.addLineSeries({
-    color: "rgba(200,75,0,1)",
-    //title: "EMA12",
-  });
-  EMA12Series.setData(plot_EMA12);
-
-  const EMA26Series = topchart.addLineSeries({
-    color: "rgba(0,100,200,1)",
-    //title: "EMA26",
-  });
-  EMA26Series.setData(plot_EMA26);
-
-  const MACDSeries = botchart.addLineSeries({
-    color: "rgba(75, 100, 200,1)",
-    //title: "MACD"
-  });
-  MACDSeries.setData(plot_MACD);
-
-  const MACDSignalSeries = botchart.addLineSeries({
-    color: "rgba(200, 100, 75,1)",
-    //title: "MACDSignal"
-  });
-  MACDSignalSeries.setData(plot_MACDsignal);
-
-  const MACDGoSeries = botchart.addHistogramSeries({
-    //title: "MACDGo"
-  });
-  MACDGoSeries.setData(plot_MACDgo);
-}
-
 function manual_rebalance() {
   writeToEventLog("Manual Rebalance Started");
-  //theStock = document.getElementById("ticker").value;
-  var runIt = new JakesCode(API_KEY, API_SECRET, PAPER, theStock);
+  var runIt = new MACDScript(API_KEY, API_SECRET, PAPER, theStock);
   runIt.rebalance();
-  //writeToEventLog("Manual Rebalance Finished");
 }

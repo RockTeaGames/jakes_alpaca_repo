@@ -8,15 +8,16 @@
   <title>Jake's Alpaca API</title>
   <link rel="stylesheet" type="text/css" href="./JakesAlpaca_browser.css" />
 
+  <script src="./JakesAlpaca_forBrowser.js"></script>
   <script src="./Jakes_Manual_API_browser.js"></script>
   <script src="./MACDScript_browser.js"></script>
+  <script src="./createMACDchart.js"></script>
   <script src="./lib/cors-api.js"></script>
-  <script src="./JakesAlpaca_forBrowser.js"></script>
-  <script src="https://cdn.plot.ly/plotly-2.2.0.min.js"></script>
+  
   <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 
-<body onload="website_load()">
+<body onload="website_load(true)">
   <nav class="nav">
     <button class="nav__toggle">
       <span class="hamburger"></span>
@@ -30,7 +31,7 @@
       </li>
       <li class="nav__item">Trading Stock</li>
       <li class="nav__item">
-        <input type="text" class="stock-width nav-input-stock" id="ticker" placeholder="STOCK" onclick="this.select()"/>
+        <input type="text" class="stock-width nav-input-stock" id="ticker" placeholder="STOCK" onclick="this.select()" oninput="this.value = this.value.toUpperCase()"/>
       </li>
       <li class="nav__item">Paper API Key/Secret</li>
       <li class="nav__item">

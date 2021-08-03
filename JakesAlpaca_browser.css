@@ -1,3 +1,7 @@
+:root {
+  --nav-bg-color: lightgray;
+}
+
 body {
   background-color: darkgray;
   overflow-x: hidden;
@@ -108,7 +112,8 @@ body {
 
 /* navigation */
 .nav {
-  background: white;
+  background: var(--nav-bg-color);
+  border-radius: 1em;
   position: absolute;
   right: 0;
   box-shadow: 0 0 3em rgba(0, 0, 0, 0.15);
@@ -118,30 +123,61 @@ body {
 }
 .nav__list {
   list-style: none;
-  margin: 0;
-  padding: 0;
+  /* margin: 0; */
+  /* padding: 0; */
   display: flex;
   flex-direction: column;
   height: fit-content;
-  padding: 3em 2em;
+  padding: 2em 1em;
+  margin: 0;
   text-align: center;
-}
-.key-width {
-  width: 25em;
-  text-align: center;
-  
-}
-.stock-width {
-  width: 6em;
-  text-align: center;
-  
 }
 
 .nav__item {
-  margin-bottom: 1em;
+  margin: 0.25em;
+}
+.nav_title {
+  margin-top: 1em;
 }
 
-.nav__link {
+.stock-width {
+  /* display: block; */
+  border: none;
+  padding: 0;
+  width: 4.8ch;
+  /* text-align: center; */
+  font: 5ch droid sans mono, consolas, monospace;
+  background: repeating-linear-gradient(90deg, dimgrey 0, dimgrey 1ch, 
+  transparent 0, transparent 1.2ch) 
+  0 100%/ 4.8ch 2px no-repeat;
+  letter-spacing: 0.2ch;
+
+}
+.stock-width:focus {
+    outline: none;
+  }
+.stock-width::selection {
+  background-color: rgba(151, 151, 151, 0.25);
+}
+
+.key-width {
+  border: none;
+  width: 25em;
+  text-align: center;
+}
+.key-width::selection {
+background-color: rgb(216, 216, 216) ;
+}
+.key-width:focus {
+  outline: none;
+  box-shadow: 0.4em 0.25em 0.25em darkgrey;
+}
+.nav_btn {
+  background-color: lightgreen;
+}
+
+
+/* .nav__link {
   text-decoration: none;
   color: darkgray;
 }
@@ -149,14 +185,14 @@ body {
 .nav__link:hover {
   text-decoration: underline;
   color: blue;
-}
+} */
 
 .nav__toggle {
   position: absolute;
   top: 0;
   left: inherit;
   transform: translateX(-100%);
-  background: white;
+  background: var(--nav-bg-color);
   padding: 1em 0.5em;
   border: 0;
   border-radius: 0.25em 0 0 0.25em;

@@ -10,6 +10,8 @@ var API_SECRET;
 const MINUTE = 60000;
 var theKill = false;
 
+var theMACD;
+
 const testissue = true;
 
 function website_load(firstLoad) {
@@ -43,7 +45,7 @@ function website_load(firstLoad) {
       "Jake's Alpaca | LIVE Trading";
   }
 
-  if ((firstLoad == true)) {
+  if (firstLoad == true) {
     document.querySelector(".nav__toggle").addEventListener("click", () => {
       document.body.classList.toggle("nav-open");
       save_keys();
@@ -83,23 +85,30 @@ function run_run() {
   writeToEventLog("Script Started: " + theLocalDateTime());
   //writeToEventLog("Starting Script");
   //theStock = document.getElementById("ticker").value;
-  var runIt = new MACDScript(API_KEY, API_SECRET, PAPER, theStock);
-  runIt.run();
+  theMACD = new MACDScript(API_KEY, API_SECRET, PAPER, theStock);
+  theMACD.run();
 }
 
 function run_stop() {
-  theKill = true;
-  writeToCurrStatus("Script Stopped", "");
-  writeToEventLog("Stopping Script");
-  //theStock = document.getElementById("ticker").value;
-  var runIt = new MACDScript(API_KEY, API_SECRET, PAPER, theStock);
-  runIt.stopIt();
+  try {
+    theKill = true;
+    theMACD.stopIt();
+    writeToCurrStatus("Script Stopped", "");
+    writeToEventLog("Stopping Script: " + theLocalDateTime());
+  } catch {
+    writeToEventLog("Script not initialized!");
+  }
   //send_logEmail();
 }
 
 function run_myAccount() {
-  var runIt = new ManualAPIFunctions(API_KEY, API_SECRET, PAPER, theStock);
-  runIt.myaccount();
+  var ManualFuncs = new ManualAPIFunctions(
+    API_KEY,
+    API_SECRET,
+    PAPER,
+    theStock
+  );
+  ManualFuncs.myaccount();
   //createChart();
 }
 
@@ -123,6 +132,6 @@ function writeToCurrStatus(textTop, textBot) {
 
 function manual_rebalance() {
   writeToEventLog("Manual Rebalance Started");
-  var runIt = new MACDScript(API_KEY, API_SECRET, PAPER, theStock);
-  runIt.rebalance();
+  theMACD = new MACDScript(API_KEY, API_SECRET, PAPER, theStock);
+  theMACD.rebalance();
 }

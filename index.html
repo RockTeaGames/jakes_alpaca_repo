@@ -23,7 +23,7 @@
     <ul class="nav__list">
       <li class="nav__item">
         <a href="https://app.alpaca.markets/brokerage/dashboard/overview" target="_blank" rel="noopener noreferrer">
-          <img src="https://app.alpaca.markets/resources/images/logo.svg" alt="Alpaca Logo"> </a> </li>
+          <img class="alpaca_logo" src="https://app.alpaca.markets/resources/images/logo.svg" alt="Alpaca Logo"> </a> </li>
       <li class="nav__item">
         <input type="text" class="stock-width nav-input-stock" id="ticker" maxlength="4" placeholder="STOK"
           onclick="this.select()" oninput="this.value = this.value.toUpperCase()" /> </li>
@@ -57,7 +57,7 @@
   <div class="output-all">
   <div class="left-output">
     <div class="outputs left-top">
-      <p class="status status-top">Script Stopped</p>
+      <p class="status status-top">Script Not Running</p>
       <p class="status status-bot"></p>
     </div>
     <pre class="outputs log-output left-bottom"></pre>
@@ -70,6 +70,7 @@
 
   <pre class="outputs right-output"></pre>
 </div>
+<button type="button" class="btn test" onclick="theTest();"> Test! </button>
 </body>
 
 </html>

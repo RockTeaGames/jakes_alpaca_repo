@@ -163,7 +163,7 @@ class MACDScript {
 
     await this.alpaca.cancelAllPositions().then((resp) => {
       var myIDstring = JSON.stringify(resp, null, 1);
-      document.querySelector(".log-info").innerHTML = myIDstring;
+      document.querySelector(".right-output").innerHTML = myIDstring;
     });
   }
 
@@ -391,7 +391,7 @@ class MACDScript {
       buyingPower +
       "<br>Daytrade Count: " +
       today_tradeCount;
-    document.querySelector(".log-info").innerHTML = minuteUpdate;
+    document.querySelector(".right-output").innerHTML = minuteUpdate;
 
     // Minute updates to title of tab
     var titleUpdate =

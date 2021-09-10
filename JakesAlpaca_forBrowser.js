@@ -93,7 +93,7 @@ function run_stop() {
   try {
     theKill = true;
     theMACD.stopIt();
-    writeToCurrStatus("Script Stopped", "");
+    writeToCurrStatus("Script Not Running", "");
     writeToEventLog("Stopping Script: " + theLocalDateTime());
   } catch {
     writeToEventLog("Script not initialized!");
@@ -116,8 +116,8 @@ function writeToEventLog(text) {
   //console.log(`${text}`);
   var someDiv = document.querySelector(".log-output");
   var addBreak = document.createElement("br");
-  someDiv.append(`${text}`, addBreak);
-  someDiv.scrollTop = someDiv.scrollHeight;
+  someDiv.prepend(`${text}`, addBreak);
+  // someDiv.scrollTop = someDiv.scrollHeight;
 }
 
 function writeToCurrStatus(textTop, textBot) {
@@ -134,4 +134,21 @@ function manual_rebalance() {
   writeToEventLog("Manual Rebalance Started");
   theMACD = new MACDScript(API_KEY, API_SECRET, PAPER, theStock);
   theMACD.rebalance();
+}
+
+function theTest() {
+
+  return fetch(`https://api.alpaca.markets/v2/puzzle/202108/hint/3131302d646179732d61667465722d6c65686d616e2d636f6c6c61707365642e6a7067`, {
+    method: 'get', 
+    mode: 'cors', 
+    headers: {
+      // "s": '3131302d646179732d61667465722d6c65686d616e2d636f6c6c61707365642e6a7067',
+      "APCA-API-KEY-ID": 'PKRWGNPNNCEZ4SQCBO3Y', 
+      "APCA-API-SECRET-KEY": '8FZTsX1r2aH8c1kewUvIqb0bwPBtpfoqTUgkUvG0'
+    },
+    body: undefined,
+  }).then((resp) => {
+    return resp.json();
+  });
+
 }

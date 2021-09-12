@@ -19,7 +19,7 @@ class ManualAPIFunctions {
   async myaccount() {
     var myID = await this.alpaca.getAccount();
     var myIDstring = JSON.stringify(myID, null, 1);
-    document.querySelector(".log-info").innerHTML = myIDstring;
+    document.querySelector(".right-output").innerHTML = myIDstring;
     //someDiv.value = myIDstring;
   }
 

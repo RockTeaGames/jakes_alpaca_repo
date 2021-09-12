@@ -19,87 +19,58 @@
 
 <body onload="website_load(true)">
   <nav class="nav">
-    <button class="nav__toggle">
-      <span class="hamburger"></span>
-    </button>
+    <button class="nav__toggle"> <span class="hamburger"></span> </button>
     <ul class="nav__list">
       <li class="nav__item">
         <a href="https://app.alpaca.markets/brokerage/dashboard/overview" target="_blank" rel="noopener noreferrer">
-          <img src="https://app.alpaca.markets/resources/images/logo.svg" alt="Alpaca Logo">
-        </a>
-      </li>
+          <img class="alpaca_logo" src="https://app.alpaca.markets/resources/images/logo.svg" alt="Alpaca Logo"> </a> </li>
       <li class="nav__item">
-        <input type="text" class="stock-width nav-input-stock" id="ticker" maxlength="4" placeholder="STOK" onclick="this.select()"
-          oninput="this.value = this.value.toUpperCase()" />
-      </li>
-      <li class="nav__item nav_title">
-        <label class="switch" onclick="save_keys()">
-          <input type="checkbox" id="paper_checkbox" />
-          <span class="slider round">PAPER</span>
-        </label>
-      </li>
+        <input type="text" class="stock-width nav-input-stock" id="ticker" maxlength="4" placeholder="STOK"
+          onclick="this.select()" oninput="this.value = this.value.toUpperCase()" /> </li>
+      <li class="nav__item nav_title"> <label class="switch" onclick="save_keys()">
+          <input type="checkbox" id="paper_checkbox" /> <span class="slider round">PAPER</span> </label> </li>
       <!-- <li class="nav__item nav_title">Stock</li> -->
-      
+
       <li class="nav__item nav_title">Paper Key/Secret</li>
-      <li class="nav__item">
-        <input type="text" class="key-width nav-paper-key" placeholder="API_KEY_PAPER" onclick="this.select()" />
-      </li>
-      <li class="nav__item">
-        <input type="text" class="key-width nav-paper-secret" placeholder="API_SECRET_PAPER" onclick="this.select()" />
-      </li>
+      <li class="nav__item"> <input type="text" class="key-width nav-paper-key" placeholder="API_KEY_PAPER"
+          onclick="this.select()" /></li>
+      <li class="nav__item"> <input type="text" class="key-width nav-paper-secret" placeholder="API_SECRET_PAPER"
+          onclick="this.select()" /></li>
       <li class="nav__item nav_title">Real Key/Secret</li>
-      <li class="nav__item">
-        <input type="text" class="key-width nav-real-key" placeholder="API_KEY" onclick="this.select()" />
-      </li>
-      <li class="nav__item">
-        <input type="text" class="key-width nav-real-secret" placeholder="API_SECRET" onclick="this.select()" />
-      </li>
+      <li class="nav__item"> <input type="text" class="key-width nav-real-key" placeholder="API_KEY"
+          onclick="this.select()" /></li>
+      <li class="nav__item"> <input type="text" class="key-width nav-real-secret" placeholder="API_SECRET"
+          onclick="this.select()" /></li>
       <li><button class="btn nav_btn nav_title" onclick="save_keys()">Save</button></li>
     </ul>
   </nav>
 
-  <div class="grid-container">
-    <p class="theTitle">Jake's Alpaca | API Trades</p>
+  <p class="theTitle">Jake's Alpaca | API Trades</p>
 
-    <button type="button" class="btn start" onclick="run_run();">
-      Run Script
-    </button>
-    <button type="button" class="btn stop" onclick="run_stop();">
-      Stop Script
-    </button>
-    <button type="button" class="btn manual-rebal" onclick="manual_rebalance();">
-      Manual Rebalance
-    </button>
-    <button type="button" class="btn getAccount" onclick="run_myAccount();">
-      Get Account Info
-    </button>
-    <div class="left-output">
-      <div class="outputs left-top">
-        <p class="status status-top">Script Stopped</p>
-        <p class="status status-bot"></p>
-      </div>
-      <pre class="outputs log-output left-bottom"></pre>
-    </div>
-    <pre class="outputs log-info"></pre>
-    <div id="chart">
-      <div id="topChart"></div>
-      <div id="botChart"></div>
-    </div>
-
-    <!-- <div class="div-input">
-        Ticker:
-        <input class="input" id="ticker" type="text" placeholder="AAPL" />
-        <br />
-        Quantity: <input class="input" id="qty" type="text" placeholder="10" />
-      </div>
-
-      <button type="button" class="btn submit" onclick="run_submitOrder();">
-        Submit Order
-      </button>
-      <button type="button" class="btn cancel" onclick="run_cancelAll();">
-        Cancel All
-      </button> -->
+  <div class="top-buttons">
+    <button type="button" class="btn start" onclick="run_run();"> Run Script </button>
+    <button type="button" class="btn stop" onclick="run_stop();"> Stop Script </button>
+    <button type="button" class="btn manual-rebal" onclick="manual_rebalance();"> Manual Rebalance </button>
+    <button type="button" class="btn getAccount" onclick="run_myAccount();"> Get Account Info </button>
   </div>
+
+  <div class="output-all">
+  <div class="left-output">
+    <div class="outputs left-top">
+      <p class="status status-top">Script Not Running</p>
+      <p class="status status-bot"></p>
+    </div>
+    <pre class="outputs log-output left-bottom"></pre>
+  </div>
+
+  <div class="mid-output" id="chart">
+    <div id="topChart"></div>
+    <div id="botChart"></div>
+  </div>
+
+  <pre class="outputs right-output"></pre>
+</div>
+<button type="button" class="btn test" onclick="theTest();"> Test! </button>
 </body>
 
 </html>
